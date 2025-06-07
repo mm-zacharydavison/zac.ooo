@@ -1,5 +1,6 @@
 import { useAccount } from "jazz-react";
 import { JazzAccount } from "./schema.ts";
+import Canvas from "./Canvas.tsx";
 
 function App() {
 	const { me } = useAccount(JazzAccount, {
@@ -8,7 +9,7 @@ function App() {
 
 	return (
 		<>
-			<main className="max-w-2xl mx-auto px-3 mt-16 flex flex-col gap-8"></main>
+    <Canvas/>
 		</>
 	);
 }
