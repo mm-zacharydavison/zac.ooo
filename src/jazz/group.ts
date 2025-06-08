@@ -15,8 +15,8 @@ function createRootGroup(me: Account) {
     owner: me,
   });
   group.addMember("everyone", "writer");
-  console.log("Created group");
-  console.log(`Add "VITE_GROUP_ID=${group.id}" to your .env file`);
+  console.log(`Created group '${group.id}'.`);
+  console.log(`Add "VITE_GROUP_ID=${group.id}" to your .env file.`);
   return group;
 }
 
@@ -36,5 +36,6 @@ export async function loadRootGroup(me: Account, groupID?: ID<Group>) {
     console.log("Group not found, creating group...");
     return createRootGroup(me);
   }
+  console.log(`Loaded group '${group.id}'.`)
   return group;
 }

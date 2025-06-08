@@ -1,55 +1,55 @@
 import { co, type Account } from "jazz-tools";
 import type { JazzId } from "./aliases";
 import { loadRootGroup } from "./group";
-import { AccountRoot, Path, Workspace, WorkspaceMap } from "./account";
+import { AccountRoot, GlobalContainer, Path, Workspace, WorkspaceList } from "./account";
 import randomColor from "randomcolor";
 
 const GLOBAL_GROUP_ID = import.meta.env.VITE_GROUP_ID
-const GLOBAL_WORKSPACE_MAP_ID = '20250608170704_global-workspace-map'
+const GLOBAL_CONTAINER_ID = '20250608175507_global-container'
 
-export async function loadWorkspaceMap(me: Account | undefined | null): Promise<JazzId | undefined> {
+export async function loadGlobalContainer(me: Account | undefined | null): Promise<JazzId | undefined> {
   if(!me) return
   const group = await loadRootGroup(me, GLOBAL_GROUP_ID)
 
-  // Find existing workspace map ID.
-  const workspaceMapId = await WorkspaceMap.findUnique(
-    GLOBAL_WORKSPACE_MAP_ID,
+  // Find existing global container.
+  const globalContainerId = await GlobalContainer.findUnique(
+    GLOBAL_CONTAINER_ID,
     group.id
   )
 
-  // Fetch the existing workspace map, if one exists.
-  let workspaceMap = await WorkspaceMap.load(workspaceMapId)
+  console.log(`Existing GlobalContainer: ${globalContainerId}.`)
 
-  if(!workspaceMap) {
-    // Create a new root workspace map.
-    workspaceMap = WorkspaceMap.create({}, { owner: group, unique: GLOBAL_WORKSPACE_MAP_ID })
+  // Fetch the existing global container, if one exists.
+  let globalContainer = await GlobalContainer.load(globalContainerId, { resolve: { workspaces: true } })
+
+  console.log(`Loaded GlobalContainer: ${globalContainer?.id}.`)
+
+  if(!globalContainer) {
+    // Create a new global container.
+    globalContainer = GlobalContainer.create({
+      workspaces: WorkspaceList.create([], { owner: group })
+    }, { owner: group, unique: GLOBAL_CONTAINER_ID })
+    console.log(`Created new GlobalContainer ${globalContainer.id}.`)
   }
 
-  // Ensure the workspace map is fully loaded before checking
-  try {
-    await workspaceMap.ensureLoaded({ 
-      resolve: { [me.id]: true } 
-    })
-  } catch (error) {
-    console.log(`Workspace for ${me.id} could not be loaded from WorkspaceMap, it will be created.`)
-  }
-
-  // Check if workspace exists more reliably (avoid falsy proxy issues with Jazz).
-  const existingWorkspace = workspaceMap[me.id]
-  if (!existingWorkspace || existingWorkspace === null) {
-    workspaceMap[me.id] = Workspace.create(
+  // Initialize the account root if it doesn't exist and link to global container.
+  if (me.root === undefined) {
+    const myWorkspace = Workspace.create(
       { 
         color: randomColor(),
-        paths: co.list(Path).create([]),
+        paths: co.list(Path).create([],{ owner: group }),
       },
       { owner: group }
     )
+    // Create this users root.
+    me.root = AccountRoot.create({
+      global: globalContainer,
+      myWorkspace
+    })
+    // Push their workspace onto the global workspaces list.
+    globalContainer.workspaces.push(myWorkspace)
+    console.log(`Created new root for user: '${me.id}'.`)
   }
 
-  // Initialize the account root if it doesn't exist and link to global workspace map.
-  if (me.root === undefined) {
-    me.root = AccountRoot.create({
-      globalWorkspaceMap: workspaceMap
-    })
-  }
+  return globalContainer.id
 }

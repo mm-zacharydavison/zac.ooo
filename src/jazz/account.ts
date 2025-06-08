@@ -25,16 +25,28 @@ export const Workspace = co.map({
 })
 
 /**
- * Map of user ID to their workspace.
+ * List of all workspaces.
  */
-export const WorkspaceMap = co.record(z.string(), Workspace)
+export const WorkspaceList = co.list(Workspace)
+
+/**
+ * All globally available data that all users can access.
+ */
+export const GlobalContainer = co.map({
+  /**
+   * All of the workspaces that exist, for all users.
+   */
+  workspaces: WorkspaceList
+})
 
 /**
  * Account root that contains user-specific data
  */
 export const AccountRoot = co.map({
-  /** Reference to the global workspace map. */
-  globalWorkspaceMap: WorkspaceMap
+  /** Reference to the global workspace list. */
+  global: GlobalContainer,
+  /** This users workspace. */
+  myWorkspace: Workspace
 })
 
 /**

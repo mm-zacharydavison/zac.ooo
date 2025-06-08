@@ -4,15 +4,15 @@ import * as Konva from "react-konva"
 import type { KonvaEventObject } from "konva/lib/Node"
 import type { JazzId } from "./jazz/aliases"
 import { useAccount, useCoState } from "jazz-react"
-import { AppAccount, WorkspaceMap } from "./jazz/account"
+import { AppAccount, GlobalContainer } from "./jazz/account"
 
 export interface CanvasProps {
   /**
-   * The ID of the `WorkspaceMap` that should be used to render all data.
+   * The ID of the `GlobalContainer` that should be used to render all data.
    * 
    * Will be loaded by the Canvas.
    */
-  workspaceMapId: JazzId
+  globalContainerId: JazzId
 }
 
 /**
@@ -22,16 +22,32 @@ export interface CanvasProps {
  * - Renders all other user canvases.
  */
 function Canvas(props: CanvasProps) {
-  const { me } = useAccount(AppAccount)
-
-  const workspaceMap = useCoState(WorkspaceMap, props.workspaceMapId, { resolve: true })
-  const myWorkspace = workspaceMap?.[me.id]
-
-  const remotePaths = Object.values(workspaceMap ?? {})
-    .flatMap((workspace) => {
-      return workspace?.paths ?? []
+  const { me } = useAccount(
+    AppAccount, 
+    { resolve: 
+      { root: 
+        { myWorkspace: true }
+      } 
     })
-    .map(jazzPath => new PathInstance(jazzPath))
+
+  const globalContainer = useCoState(
+    GlobalContainer,
+    props.globalContainerId,
+    { resolve:
+      { workspaces:
+        { $each: { paths: true } 
+      } 
+    } 
+  })
+  const myWorkspace = me?.root?.myWorkspace
+
+  const remotePaths = (globalContainer?.workspaces ?? [])
+    ?.flatMap((workspace) => {
+      return (workspace?.paths ?? [])
+        .map(jazzPath => new PathInstance(jazzPath, 'simplified', workspace.color)) // We store paths as 'simplified'.
+    })
+
+  console.log('remotePaths', remotePaths)
 
   const [localPaths, setLocalPaths] = useState<PathInstance[]>([])
   const [currentPath, setCurrentPath] = useState<PathInstance | null>(null)
@@ -59,7 +75,11 @@ function Canvas(props: CanvasProps) {
     setCurrentPath(null)
   }
 
+  console.log('localPaths', localPaths)
+
   const allPaths = [...remotePaths, ...localPaths, currentPath].filter(Boolean) as PathInstance[]
+
+  console.log('allPaths', allPaths)
 
   return <Konva.Stage 
     width={window.innerWidth} 
@@ -73,7 +93,7 @@ function Canvas(props: CanvasProps) {
         <Konva.Path
           key={path.id}
           data={path.beautified().renderToSVGPath()}
-          fill={myWorkspace?.color ?? '#000000'}
+          fill={path.color ?? myWorkspace?.color ?? '#000000'}
         />
       ))}
     </Konva.Layer>

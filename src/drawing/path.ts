@@ -1,6 +1,7 @@
 import { Simplify } from "simplify-ts"
 import * as perfect from "perfect-freehand"
 import { uuidv7 } from "uuidv7";
+import { HexColorString } from "../jazz/aliases";
 
 /**
  * A 2D point in space.
@@ -41,11 +42,17 @@ export class PathInstance {
    */
   public readonly id = uuidv7()
   public readonly points: Point[]
+
+  /**
+   * A desired color for this path, if any.
+   */
+  public readonly color?: HexColorString
   public type: PathType
 
-  constructor(points: Point[] = [], type: PathType = 'raw')  {
+  constructor(points: Point[] = [], type: PathType = 'raw', color?: HexColorString)  {
     this.points = points
     this.type = type
+    this.color = color
   }
 
   /**
