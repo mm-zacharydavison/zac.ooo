@@ -259,7 +259,6 @@ function Canvas(props: CanvasProps) {
 				onMouseUp={onMouseUp}
 				onWheel={handleWheel}
 			>
-				<Konva.Layer></Konva.Layer>
 				<Konva.Layer>
 					{allPaths.map((path) => (
 						<Konva.Path
