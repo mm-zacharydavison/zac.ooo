@@ -3,6 +3,7 @@ import type { JazzId } from "./aliases";
 import { loadRootGroup } from "./group";
 import { AccountRoot, GlobalContainer, Path, Workspace, WorkspaceList } from "./account";
 import randomColor from "randomcolor";
+import { MAX_INK } from "../drawing/constants";
 
 const GLOBAL_GROUP_ID = import.meta.env.VITE_GROUP_ID
 const GLOBAL_CONTAINER_ID = '20250608175508_global-container'
@@ -38,6 +39,7 @@ export async function loadGlobalContainer(me: Account | undefined | null): Promi
       { 
         color: randomColor(),
         paths: co.list(Path).create([],{ owner: group }),
+        remainingInk: MAX_INK
       },
       { owner: group }
     )

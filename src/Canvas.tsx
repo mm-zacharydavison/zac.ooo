@@ -5,6 +5,8 @@ import type { KonvaEventObject } from "konva/lib/Node"
 import type { JazzId } from "./jazz/aliases"
 import { useAccount, useCoState } from "jazz-react"
 import { AppAccount, GlobalContainer } from "./jazz/account"
+import { MAX_INK } from "./drawing/constants"
+import InkBar from "./components/InkBar"
 
 export interface CanvasProps {
   /**
@@ -57,6 +59,11 @@ function Canvas(props: CanvasProps) {
   const [isPanning, setIsPanning] = useState(false)
   const [lastPanPoint, setLastPanPoint] = useState<{ x: number, y: number } | null>(null)
 
+  // Ink state
+  const [currentInk, setCurrentInk] = useState(100)
+  const [initialInkForCurrentPath, setInitialInkForCurrentPath] = useState(100)
+  const maxInk = 100
+
   // Drawing functions
   const handleDrawingStart = (e: KonvaEventObject<MouseEvent>) => {
     const position = e.target.getStage()?.getPointerPosition()
@@ -70,6 +77,7 @@ function Canvas(props: CanvasProps) {
 
     const path = new PathInstance([[canvasPos.x, canvasPos.y]], 'raw', undefined, stageScale)
     setCurrentPath(path)
+    setInitialInkForCurrentPath(currentInk)
     setIsDrawing(true)
   }
 
@@ -85,15 +93,38 @@ function Canvas(props: CanvasProps) {
     const transform = stage.getAbsoluteTransform().copy().invert()
     const canvasPos = transform.point(position)
     
-    setCurrentPath(currentPath.appended([canvasPos.x, canvasPos.y]))
+    const updatedPath = currentPath.appended([canvasPos.x, canvasPos.y])
+    setCurrentPath(updatedPath)
+    
+    // Calculate ink usage in real-time
+    const pathLength = updatedPath.points.reduce((acc, point, index) => {
+      if (index === 0) return acc
+      const prevPoint = updatedPath.points[index - 1]
+      const distance = Math.sqrt(
+        (point[0] - prevPoint[0]) ** 2 + (point[1] - prevPoint[1]) ** 2
+      )
+      return acc + distance
+    }, 0)
+    
+    const inkUsed = Math.min(pathLength / MAX_INK, initialInkForCurrentPath)
+    const newInkLevel = Math.max(0, initialInkForCurrentPath - inkUsed)
+    setCurrentInk(newInkLevel)
   }
 
   const handleDrawingEnd = () => {
     if (!currentPath) return
 
     const currentPathSimplified = currentPath.simplified()
-    myWorkspace?.paths?.push({ points: currentPathSimplified.points, scale: stageScale })
-    setLocalPaths([...localPaths, currentPathSimplified])
+    
+    // Only save the path if we have enough ink remaining
+    if (currentInk > 0) {
+      myWorkspace?.paths?.push({ points: currentPathSimplified.points, scale: stageScale })
+      setLocalPaths([...localPaths, currentPathSimplified])
+    } else {
+      // If no ink left, restore the initial ink level since path won't be saved
+      setCurrentInk(initialInkForCurrentPath)
+    }
+    
     setCurrentPath(null)
     setIsDrawing(false)
   }
@@ -185,30 +216,47 @@ function Canvas(props: CanvasProps) {
     setStagePos(newPos)
   }
 
+  const onResetInk = () => {
+    if(!myWorkspace) return
+    // Remote state
+    myWorkspace.paths?.splice(0, myWorkspace.paths.length)
+    myWorkspace.remainingInk = MAX_INK
+    // Local state
+    setCurrentInk(MAX_INK)
+    setLocalPaths([])
+  }
+
   const allPaths = [...remotePaths, ...localPaths, currentPath].filter(Boolean) as PathInstance[]
 
-  return <Konva.Stage 
-    width={window.innerWidth} 
-    height={window.innerHeight}
-    scaleX={stageScale}
-    scaleY={stageScale}
-    x={stagePos.x}
-    y={stagePos.y}
-    onMouseDown={onMouseDown}
-    onMouseMove={onMouseMove}
-    onMouseUp={onMouseUp}
-    onWheel={handleWheel}
-    >
-    <Konva.Layer>
-      {allPaths.map((path) => (
-        <Konva.Path
-          key={path.id}
-          data={path.beautified().renderToSVGPath()}
-          fill={path.color ?? myWorkspace?.color ?? '#000000'}
-        />
-      ))}
-    </Konva.Layer>
-  </Konva.Stage>
+  return (
+    <div style={{ position: 'relative', width: '100vw', height: '100vh' }}>
+      <InkBar currentInk={currentInk} maxInk={maxInk} inkColor={myWorkspace?.color ?? '#000000'} onResetInk={onResetInk} />
+      <Konva.Stage 
+        width={window.innerWidth} 
+        height={window.innerHeight}
+        scaleX={stageScale}
+        scaleY={stageScale}
+        x={stagePos.x}
+        y={stagePos.y}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        onWheel={handleWheel}
+        >
+        <Konva.Layer>
+        </Konva.Layer>
+        <Konva.Layer>
+          {allPaths.map((path) => (
+            <Konva.Path
+              key={path.id}
+              data={path.beautified().renderToSVGPath()}
+              fill={path.color ?? myWorkspace?.color ?? '#000000'}
+            />
+          ))}
+        </Konva.Layer>
+      </Konva.Stage>
+    </div>
+  )
 }
 
 export default Canvas;

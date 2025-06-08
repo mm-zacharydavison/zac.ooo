@@ -26,7 +26,13 @@ export const Workspace = co.map({
   /**
    * Paths to be drawn.
    */
-  paths: co.list(Path)
+  paths: co.list(Path),
+  /**
+   * Amount of ink remaining in this workspace for drawing.
+   * 
+   * When it is 0, no more can be drawn until ink is re-claimed.
+   */
+  remainingInk: z.number()
 })
 
 /**
