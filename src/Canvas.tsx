@@ -73,7 +73,7 @@ function Canvas(props: CanvasProps) {
         <Konva.Path
           key={path.id}
           data={path.beautified().renderToSVGPath()}
-          fill='#000000'
+          fill={myWorkspace?.color ?? '#000000'}
         />
       ))}
     </Konva.Layer>

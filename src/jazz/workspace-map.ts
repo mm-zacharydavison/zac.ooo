@@ -2,9 +2,10 @@ import { co, type Account } from "jazz-tools";
 import type { JazzId } from "./aliases";
 import { loadRootGroup } from "./group";
 import { AccountRoot, Path, Workspace, WorkspaceMap } from "./account";
+import randomColor from "randomcolor";
 
 const GLOBAL_GROUP_ID = import.meta.env.VITE_GROUP_ID
-const GLOBAL_WORKSPACE_MAP_ID = '20250608164852_global-workspace-map'
+const GLOBAL_WORKSPACE_MAP_ID = '20250608170704_global-workspace-map'
 
 export async function loadWorkspaceMap(me: Account | undefined | null): Promise<JazzId | undefined> {
   if(!me) return
@@ -33,16 +34,19 @@ export async function loadWorkspaceMap(me: Account | undefined | null): Promise<
     console.log(`Workspace for ${me.id} could not be loaded from WorkspaceMap, it will be created.`)
   }
 
-  // Check if workspace exists more reliably
+  // Check if workspace exists more reliably (avoid falsy proxy issues with Jazz).
   const existingWorkspace = workspaceMap[me.id]
   if (!existingWorkspace || existingWorkspace === null) {
     workspaceMap[me.id] = Workspace.create(
-      { paths: co.list(Path).create([]) },
+      { 
+        color: randomColor(),
+        paths: co.list(Path).create([]),
+      },
       { owner: group }
     )
   }
 
-  // Initialize the account root if it doesn't exist and link to global workspace map
+  // Initialize the account root if it doesn't exist and link to global workspace map.
   if (me.root === undefined) {
     me.root = AccountRoot.create({
       globalWorkspaceMap: workspaceMap

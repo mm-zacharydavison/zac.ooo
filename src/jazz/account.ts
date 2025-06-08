@@ -14,6 +14,13 @@ export const Path = z.array(Point)
  * A workspace that can contain drawings and other assets for rendering.
  */
 export const Workspace = co.map({
+  /**
+   * The color used for all of this workspace content.
+   */
+  color: z.string(),
+  /**
+   * Paths to be drawn.
+   */
   paths: co.list(Path)
 })
 

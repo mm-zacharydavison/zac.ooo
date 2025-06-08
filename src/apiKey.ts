@@ -1,1 +1,1 @@
-export const apiKey = "experimental-canvas-drawing-v5@zac.ooo";
+export const apiKey = "experimental-canvas-drawing-v6@zac.ooo";
