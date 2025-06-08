@@ -1,64 +1,57 @@
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import { Path } from "./drawing/path"
+import * as Konva from "react-konva"
+import type { KonvaEventObject } from "konva/lib/Node"
 
 function Canvas() {
 
-  const canvasRef = useRef<HTMLCanvasElement>(null)
   const [paths, setPaths] = useState<Path[]>([])
   const [currentPath, setCurrentPath] = useState<Path | null>(null)
 
-  const onMouseDown = (e: React.MouseEvent) => {
-    const path = new Path([[e.pageX, e.pageY]])
+  const onMouseDown = (e: KonvaEventObject<MouseEvent>) => {
+    const position = e.target.getStage()?.getPointerPosition()
+    if (!position) { return }
+
+    const path = new Path([[position.x, position.y]])
     setCurrentPath(path)
-    console.log('onMouseDown', currentPath)
   }
 
-  const onMouseMove = (e: React.MouseEvent) => {
-    if (!currentPath) { return }
-    setCurrentPath(currentPath.appended([e.pageX, e.pageY]))
-    console.log('onMouseMove', currentPath)
+  const onMouseMove = (e: KonvaEventObject<MouseEvent>) => {
+    const position = e.target.getStage()?.getPointerPosition()
+    if (!currentPath || !position) { return }
+    setCurrentPath(currentPath.appended([position.x, position.y]))
   }
 
-  const onMouseUp = (e: React.MouseEvent) => {
+  const onMouseUp = (e: KonvaEventObject<MouseEvent>) => {
     if(!currentPath) { return }
 
-    paths.push(currentPath.simplified())
-    setPaths(paths)
+    setPaths([...paths, currentPath.simplified()])
     setCurrentPath(null)
   }
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
-    if (!canvas ||!ctx) { return }
-
-    // draw settings
-    ctx.fillStyle = '#fffbf7'
-
-    // Background
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-
-    // Draw all paths
-    if (currentPath) {
-      paths.push(currentPath)
-    }
-
-    for (const path of paths) {
-      const path2d = new Path2D(path.beautified().renderToSVGPath())
-      ctx.fillStyle = '#000000'
-      ctx.fill(path2d)
-    }
-  }, [currentPath, paths])
-7
-  return <canvas 
-    ref={canvasRef} 
-    id="canvas" 
+  return <Konva.Stage 
     width={window.innerWidth} 
-    height={window.innerHeight} 
-    onMouseDown={onMouseDown} 
-    onMouseMove={onMouseMove} 
+    height={window.innerHeight}
+    onMouseDown={onMouseDown}
+    onMouseMove={onMouseMove}
     onMouseUp={onMouseUp}
-  />;
+    >
+    <Konva.Layer>
+      {paths.map((path) => (
+        <Konva.Path
+          key={path.id}
+          data={path.beautified().renderToSVGPath()}
+          fill='#000000'
+        />
+      ))}
+      {currentPath && (
+        <Konva.Path
+          data={currentPath.beautified().renderToSVGPath()}
+          fill='#000000'
+        />
+      )}
+    </Konva.Layer>
+  </Konva.Stage>
 }
 
 export default Canvas;

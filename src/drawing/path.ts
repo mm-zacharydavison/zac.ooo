@@ -1,5 +1,6 @@
 import { Simplify } from "simplify-ts"
 import * as perfect from "perfect-freehand"
+import { uuidv7 } from "uuidv7";
 
 /**
  * A 2D point in space.
@@ -32,6 +33,13 @@ const average = (a: number, b: number) => (a + b) / 2
  * All functions return a new path, and do not modify in place.
  */
 export class Path {
+
+  /**
+   * Provides a unique ID for this path.
+   * 
+   * Useful for rendering.
+   */
+  public readonly id = uuidv7()
   public readonly points: Point[]
   public type: PathType
 
@@ -57,8 +65,15 @@ export class Path {
    * @returns A new, simplified path.
    */
   simplified(): Path {
+
+    const tolerance = 0.3
+
     return new Path(
-      Simplify(this.points.map(p => ({x: p[0], y: p[1]}))).map(p => [p.x, p.y]), // Convert points between formats and back.
+      Simplify(
+        this.points.map(p => ({x: p[0], y: p[1]})), 
+        tolerance, 
+        true
+      ).map(p => [p.x, p.y]),
       'simplified'
     )
   }
