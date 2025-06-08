@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Canvas from "./Canvas";
 import { AppAccount } from "./jazz/account";
 import type { JazzId } from "./jazz/aliases";
-import { loadGlobalContainer } from "./jazz/workspace-map";
+import { loadRoot } from "./jazz/workspace-map";
 
 /**
  * Wraps the `Canvas` and loads the global CanvasFeed from Jazz.
@@ -20,7 +20,7 @@ export function CanvasContainer() {
 
 	useEffect(() => {
 		const load = async () => {
-			const id = await loadGlobalContainer(me);
+			const id = await loadRoot(me);
 			setLoaded(true);
 			setGlobalContainerId(id);
 		};

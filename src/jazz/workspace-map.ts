@@ -12,9 +12,14 @@ import type { JazzId } from "./aliases";
 import { loadRootGroup } from "./group";
 
 const GLOBAL_GROUP_ID = import.meta.env.VITE_GROUP_ID;
-const GLOBAL_CONTAINER_ID = "20250608175508_global-container";
+const GLOBAL_CONTAINER_ID = "20250608194432_global-container";
 
-export async function loadGlobalContainer(
+/**
+ * Loads (or initializes, if needed) the root object that stores state.
+ * @param me - The current user.
+ * @returns The JazzId of the global container.
+ */
+export async function loadRoot(
 	me: Account | undefined | null,
 ): Promise<JazzId | undefined> {
 	if (!me) return;

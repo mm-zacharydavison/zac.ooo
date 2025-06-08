@@ -1,1 +1,1 @@
-export const apiKey = "experimental-canvas-drawing-v6@zac.ooo";
+export const apiKey = import.meta.env.VITE_JAZZ_API_KEY || "development@zac.ooo";

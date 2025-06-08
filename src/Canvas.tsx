@@ -28,25 +28,28 @@ function Canvas(props: CanvasProps) {
 		resolve: { root: { myWorkspace: true } },
 	});
 
+  // Get the global container state (including all other user paths).
 	const globalContainer = useCoState(GlobalContainer, props.globalContainerId, {
 		resolve: { workspaces: { $each: { paths: true } } },
 	});
 	const myWorkspace = me?.root?.myWorkspace;
 
+  // Calculate paths from Jazz.
 	const remotePaths = (globalContainer?.workspaces ?? [])?.flatMap(
 		(workspace) => {
 			return (workspace?.paths ?? []).map(
 				(jazzPath) =>
 					new PathInstance(
 						jazzPath.points,
-						"simplified",
+						"simplified",     // We store paths as 'simplified'.
 						workspace.color,
 						jazzPath.scale,
 					),
-			); // We store paths as 'simplified'.
+			);
 		},
 	);
 
+  // Local path state
 	const [localPaths, setLocalPaths] = useState<PathInstance[]>([]);
 	const [currentPath, setCurrentPath] = useState<PathInstance | null>(null);
 
@@ -235,6 +238,7 @@ function Canvas(props: CanvasProps) {
 		setLocalPaths([]);
 	};
 
+  // Get all paths for drawing.
 	const allPaths = [...remotePaths, ...localPaths, currentPath].filter(
 		Boolean,
 	) as PathInstance[];
