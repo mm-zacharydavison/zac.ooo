@@ -1,7 +1,7 @@
 import { Simplify } from "simplify-ts"
 import * as perfect from "perfect-freehand"
 import { uuidv7 } from "uuidv7";
-import { HexColorString } from "../jazz/aliases";
+import type { HexColorString } from "../jazz/aliases";
 
 /**
  * A 2D point in space.
