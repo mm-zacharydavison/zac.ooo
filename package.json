@@ -17,9 +17,11 @@
 		"jazz-inspector": "^0.14.21",
 		"jazz-react": "^0.14.21",
 		"jazz-tools": "^0.14.21",
+		"konva": "^9.3.20",
 		"perfect-freehand": "^1.2.2",
 		"react": "18.3.1",
 		"react-dom": "18.3.1",
+		"react-konva": "^19.0.5",
 		"simplify-ts": "^1.0.2"
 	},
 	"devDependencies": {
