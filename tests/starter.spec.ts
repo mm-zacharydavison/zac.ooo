@@ -1,6 +1,10 @@
 import { test } from "@playwright/test";
 
-// Functionality
+// Functionality (General)
+test.fixme('The user can right click anywhere to open the tool menu.', () => {})
+
+// Functionality (Drawing)
+test.fixme('The user can select the drawing tool from the tool menu.', () => {})
 test.fixme('A user can draw on the canvas.', () => {})
 test.fixme('A user can upload audio and place it on the canvas.', () => {})
 test.fixme('Whatever the user does on the canvas, will be visible to all users.', () => {})
@@ -8,6 +12,13 @@ test.fixme('Each user is assigned a unique color for all their content.', () => 
 test.fixme('The canvas should be pannable infinitely.', () => {})
 test.fixme('The canvas should be zoomable in/out', () => {})
 test.fixme('The users pencil will stay at a constant width regardless of zoom level', () => {})
+
+// Functionality (Audio)
+test.fixme('The user can select the audio clip tool from the tool menu.', () => {})
+test.fixme('The user can upload an audio clip and place it on the canvas.', () => {})
+test.fixme('The audio clip waveform will be displayed on the canvas where it was placed.', () => {})
+test.fixme('The audio clip waveform will be rendered in the users unique color.', () => {})
+test.fixme('The audio clip can be clicked to play/stop it.', () => {})
 
 // Deployment
 test.fixme('The app can be deployed in one step.', () => {})

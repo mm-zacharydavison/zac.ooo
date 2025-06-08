@@ -47,8 +47,6 @@ function Canvas(props: CanvasProps) {
         .map(jazzPath => new PathInstance(jazzPath.points, 'simplified', workspace.color, jazzPath.scale)) // We store paths as 'simplified'.
     })
 
-  console.log('remotePaths', remotePaths)
-
   const [localPaths, setLocalPaths] = useState<PathInstance[]>([])
   const [currentPath, setCurrentPath] = useState<PathInstance | null>(null)
   
@@ -134,12 +132,13 @@ function Canvas(props: CanvasProps) {
 
   // Main mouse event handlers
   const onMouseDown = (e: KonvaEventObject<MouseEvent>) => {
-    if (e.evt.button === 0) {
-      // Left click for drawing
-      handleDrawingStart(e)
-    } else if (e.evt.button === 1) {
-      // Middle click for panning
-      handlePanningStart(e)
+    switch (e.evt.button) {
+      case 0: // Left click
+        handleDrawingStart(e)
+        break
+      case 1: // Middle click
+        handlePanningStart(e)
+        break
     }
   }
 
@@ -153,10 +152,10 @@ function Canvas(props: CanvasProps) {
 
   const onMouseUp = (e: KonvaEventObject<MouseEvent>) => {
     if (e.evt.button === 0 && isDrawing) {
-      // Left click release - end drawing
+      // Left click release
       handleDrawingEnd()
     } else if (e.evt.button === 1 && isPanning) {
-      // Middle click release - end panning
+      // Middle click release
       handlePanningEnd()
     }
   }
@@ -186,11 +185,7 @@ function Canvas(props: CanvasProps) {
     setStagePos(newPos)
   }
 
-  console.log('localPaths', localPaths)
-
   const allPaths = [...remotePaths, ...localPaths, currentPath].filter(Boolean) as PathInstance[]
-
-  console.log('allPaths', allPaths)
 
   return <Konva.Stage 
     width={window.innerWidth} 
