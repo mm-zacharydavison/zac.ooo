@@ -49,10 +49,17 @@ export class PathInstance {
   public readonly color?: HexColorString
   public type: PathType
 
-  constructor(points: Point[] = [], type: PathType = 'raw', color?: HexColorString)  {
+  /**
+   * The scale at which this path was drawn.
+   * Used to maintain constant stroke width regardless of zoom level.
+   */
+  public readonly scale: number
+
+  constructor(points: Point[] = [], type: PathType = 'raw', color?: HexColorString, scale = 1)  {
     this.points = points
     this.type = type
     this.color = color
+    this.scale = scale
   }
 
   /**
@@ -63,7 +70,9 @@ export class PathInstance {
   appended(point: Point): PathInstance {
     return new PathInstance(
       [...this.points, point],
-      this.type
+      this.type,
+      this.color,
+      this.scale
     )
   }
 
@@ -81,21 +90,35 @@ export class PathInstance {
         tolerance, 
         true
       ).map(p => [p.x, p.y]),
-      'simplified'
+      'simplified',
+      this.color,
+      this.scale
     )
   }
 
   /**
    * Uses perfect-freehand to simulate pressure and create an outline, for a more realistic looking path.
    * 
+   * The stroke size is adjusted based on the scale to maintain constant visual width.
+   * 
    * Note: The resulting path should be filled, not stroked.
    * 
    * @returns A new, beautified path.
    */
   beautified(): PathInstance {
+    const baseSize = 4 // Base stroke width in pixels
+    const adjustedSize = baseSize / this.scale // Adjust size inversely to scale
+    
     return new PathInstance(
-      perfect.getStroke(this.points) as Point[],
-      'beautified'
+      perfect.getStroke(this.points, {
+        size: adjustedSize,
+        thinning: 0.5,
+        smoothing: 0.5,
+        streamline: 0.5,
+      }) as Point[],
+      'beautified',
+      this.color,
+      this.scale
     )
   }
 
@@ -128,10 +151,7 @@ export class PathInstance {
         2
       )} `
     }
-  
-    if (closed) {
-      result += 'Z'
-    }
+
   
     return result
   }

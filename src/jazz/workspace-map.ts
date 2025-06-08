@@ -5,7 +5,7 @@ import { AccountRoot, GlobalContainer, Path, Workspace, WorkspaceList } from "./
 import randomColor from "randomcolor";
 
 const GLOBAL_GROUP_ID = import.meta.env.VITE_GROUP_ID
-const GLOBAL_CONTAINER_ID = '20250608175507_global-container'
+const GLOBAL_CONTAINER_ID = '20250608175508_global-container'
 
 export async function loadGlobalContainer(me: Account | undefined | null): Promise<JazzId | undefined> {
   if(!me) return

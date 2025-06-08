@@ -8,7 +8,12 @@ export const Point = z.tuple([z.number(), z.number()])
 /**
  * A 2D path (x,y).
  */
-export const Path = z.array(Point)
+export const Path = z.object({
+  /** The points of the path. */
+  points: z.array(Point),
+  /** The scale this path should be drawn at. */
+  scale: z.number()
+})
 
 /**
  * A workspace that can contain drawings and other assets for rendering.
