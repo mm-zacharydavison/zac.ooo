@@ -5,10 +5,10 @@ import App from "./App.tsx";
 import "./index.css";
 import { JazzInspector } from "jazz-inspector";
 import { apiKey } from "./apiKey.ts";
-import { JazzAccount } from "./schema.ts";
+import { AppAccount } from "./jazz/account.ts";
 
 // This identifies the app in the passkey auth
-export const APPLICATION_NAME = "jazz-react-tailwind-starter";
+export const APPLICATION_NAME = "zac.ooo";
 
 // biome-ignore lint/style/noNonNullAssertion: Root element is guaranteed to exist.
 createRoot(document.getElementById("root")!).render(
@@ -16,11 +16,11 @@ createRoot(document.getElementById("root")!).render(
 		<JazzProvider
 			sync={{
 				peer: `wss://cloud.jazz.tools/?key=${apiKey}`,
+        when: 'always'
 			}}
-			AccountSchema={JazzAccount}
+			AccountSchema={AppAccount}
 		>
 			<App />
-
 			<JazzInspector />
 		</JazzProvider>
 	</StrictMode>,

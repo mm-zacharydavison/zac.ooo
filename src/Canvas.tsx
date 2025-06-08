@@ -1,18 +1,46 @@
 import { useState } from "react"
-import { Path } from "./drawing/path"
+import { PathInstance } from "./drawing/path"
 import * as Konva from "react-konva"
 import type { KonvaEventObject } from "konva/lib/Node"
+import type { JazzId } from "./jazz/aliases"
+import { useAccount, useCoState } from "jazz-react"
+import { AppAccount, WorkspaceMap } from "./jazz/account"
 
-function Canvas() {
+export interface CanvasProps {
+  /**
+   * The ID of the `WorkspaceMap` that should be used to render all data.
+   * 
+   * Will be loaded by the Canvas.
+   */
+  workspaceMapId: JazzId
+}
 
-  const [paths, setPaths] = useState<Path[]>([])
-  const [currentPath, setCurrentPath] = useState<Path | null>(null)
+/**
+ * The live, multiplayer drawing canvas.
+ * 
+ * - Allows user to draw and commit their canvas.
+ * - Renders all other user canvases.
+ */
+function Canvas(props: CanvasProps) {
+  const { me } = useAccount(AppAccount)
+
+  const workspaceMap = useCoState(WorkspaceMap, props.workspaceMapId, { resolve: true })
+  const myWorkspace = workspaceMap?.[me.id]
+
+  const remotePaths = Object.values(workspaceMap ?? {})
+    .flatMap((workspace) => {
+      return workspace?.paths ?? []
+    })
+    .map(jazzPath => new PathInstance(jazzPath))
+
+  const [localPaths, setLocalPaths] = useState<PathInstance[]>([])
+  const [currentPath, setCurrentPath] = useState<PathInstance | null>(null)
 
   const onMouseDown = (e: KonvaEventObject<MouseEvent>) => {
     const position = e.target.getStage()?.getPointerPosition()
     if (!position) { return }
 
-    const path = new Path([[position.x, position.y]])
+    const path = new PathInstance([[position.x, position.y]])
     setCurrentPath(path)
   }
 
@@ -25,9 +53,13 @@ function Canvas() {
   const onMouseUp = (e: KonvaEventObject<MouseEvent>) => {
     if(!currentPath) { return }
 
-    setPaths([...paths, currentPath.simplified()])
+    const currentPathSimplified = currentPath.simplified()
+    myWorkspace?.paths?.push(currentPathSimplified.points)
+    setLocalPaths([...localPaths, currentPathSimplified])
     setCurrentPath(null)
   }
+
+  const allPaths = [...remotePaths, ...localPaths, currentPath].filter(Boolean) as PathInstance[]
 
   return <Konva.Stage 
     width={window.innerWidth} 
@@ -37,19 +69,13 @@ function Canvas() {
     onMouseUp={onMouseUp}
     >
     <Konva.Layer>
-      {paths.map((path) => (
+      {allPaths.map((path) => (
         <Konva.Path
           key={path.id}
           data={path.beautified().renderToSVGPath()}
           fill='#000000'
         />
       ))}
-      {currentPath && (
-        <Konva.Path
-          data={currentPath.beautified().renderToSVGPath()}
-          fill='#000000'
-        />
-      )}
     </Konva.Layer>
   </Konva.Stage>
 }

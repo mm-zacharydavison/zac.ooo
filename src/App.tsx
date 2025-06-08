@@ -1,14 +1,8 @@
-import { useAccount } from "jazz-react";
-import { JazzAccount } from "./schema.ts";
-import Canvas from "./Canvas.tsx";
+import { CanvasContainer } from "./CanvasContainer";
 
 function App() {
-	const { me } = useAccount(JazzAccount, {
-		resolve: { profile: true, root: true },
-	});
-
 	return (
-    <Canvas/>
+    <CanvasContainer/>
 	);
 }
 

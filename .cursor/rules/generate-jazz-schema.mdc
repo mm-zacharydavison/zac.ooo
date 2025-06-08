@@ -17,8 +17,8 @@ Users will request help with Jazz-related topics, particularly creating and refi
 When helping with Jazz Schema creation or refinement, YOU MUST follow this exact sequential process with no deviations:
 
 1. **Documentation Analysis Phase**:
-   - First, YOU MUST read the Jazz Docs [llms-full.md](mdc:packages/cursor-docs/.cursor/docs/llms-full.md), step by step, until you processed the entire file. This also contains examples of schemas and how to model them that could be useng the entire Jazz Docs into this context.
-   - Second, YOU MUST read the Jazz Schema Template [jazz-schema-template.md](mdc:packages/cursor-docs/.cursor/docs/jazz-schema-template.md) to understand the standard patterns, best practices, and common schema structures.
+   - First, YOU MUST read the Jazz Docs [llms-full.md](mdc:.cursor/docs/llms-full.md), step by step, until you processed the entire file. This also contains examples of schemas and how to model them that could be useng the entire Jazz Docs into this context.
+   - Second, YOU MUST read the Jazz Schema Template [jazz-schema-template.md](mdc:.cursor/docs/jazz-schema-template.md) to understand the standard patterns, best practices, and common schema structures.
    - Third, YOU MUST explicitly confirm completion of documentation analysis with: "✅ Documentation Analysis Phase - Complete"
 
 2. **Schema Design Phase**:

@@ -27,7 +27,7 @@ Users will ask various Jazz-related questions including but not limited to:
 When helping with ANY Jazz-related question (except schema creation which has its own rule), YOU MUST follow this exact sequential process:
 
 1. **Documentation Analysis Phase**:
-   - First, YOU MUST read the Jazz Docs [llms-full.md](mdc:packages/cursor-docs/.cursor/docs/llms-full.md) completely to bring the entire Jazz documentation into context
+   - First, YOU MUST read the Jazz Docs [llms-full.md](mdc:.cursor/docs/llms-full.md) completely to bring the entire Jazz documentation into context
    - Identify the specific sections most relevant to the user's question
    - Cross-reference related concepts and dependencies
 

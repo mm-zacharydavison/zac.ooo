@@ -32,7 +32,7 @@ const average = (a: number, b: number) => (a + b) / 2
  * 
  * All functions return a new path, and do not modify in place.
  */
-export class Path {
+export class PathInstance {
 
   /**
    * Provides a unique ID for this path.
@@ -53,8 +53,8 @@ export class Path {
    * @param point
    * @returns A new path object with the point appended.
    */
-  appended(point: Point): Path {
-    return new Path(
+  appended(point: Point): PathInstance {
+    return new PathInstance(
       [...this.points, point],
       this.type
     )
@@ -64,11 +64,11 @@ export class Path {
    * Uses `simplify-ts` to simplify the path.
    * @returns A new, simplified path.
    */
-  simplified(): Path {
+  simplified(): PathInstance {
 
     const tolerance = 0.3
 
-    return new Path(
+    return new PathInstance(
       Simplify(
         this.points.map(p => ({x: p[0], y: p[1]})), 
         tolerance, 
@@ -85,8 +85,8 @@ export class Path {
    * 
    * @returns A new, beautified path.
    */
-  beautified(): Path {
-    return new Path(
+  beautified(): PathInstance {
+    return new PathInstance(
       perfect.getStroke(this.points) as Point[],
       'beautified'
     )
