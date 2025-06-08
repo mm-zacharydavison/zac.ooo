@@ -1,7 +1,7 @@
 {
 	"build": {
 		"env": {
-			"APP_NAME": "jazz-react-tailwind-starter"
+			"APP_NAME": "zac-ooo"
 		}
 	},
 	"ignoreCommand": "node ../../ignore-vercel-build.js"
