@@ -54,7 +54,8 @@ export class PathInstance {
 	 */
 	public readonly scale: number
 
-	constructor(points: Point[] = [], type: PathType = "raw", color?: HexColorString, scale = 1) {
+	constructor(id: string | null, points: Point[] = [], type: PathType = "raw", color?: HexColorString, scale = 1) {
+    this.id = id ?? JSON.stringify({points, type}) // quick and dirty unique id
 		this.points = points
 		this.type = type
 		this.color = color
@@ -67,7 +68,7 @@ export class PathInstance {
 	 * @returns A new path object with the point appended.
 	 */
 	appended(point: Point): PathInstance {
-		return new PathInstance([...this.points, point], this.type, this.color, this.scale)
+		return new PathInstance(null, [...this.points, point], this.type, this.color, this.scale)
 	}
 
 	/**
@@ -78,6 +79,7 @@ export class PathInstance {
 		const tolerance = 0.3
 
 		return new PathInstance(
+      null,
 			Simplify(
 				this.points.map((p) => ({ x: p[0], y: p[1] })),
 				tolerance,
@@ -103,6 +105,7 @@ export class PathInstance {
 		const adjustedSize = baseSize / this.scale // Adjust size inversely to scale
 
 		return new PathInstance(
+      null,
 			perfect.getStroke(this.points, {
 				size: adjustedSize,
 				thinning: 0.5,

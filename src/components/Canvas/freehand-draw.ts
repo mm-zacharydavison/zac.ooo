@@ -55,10 +55,13 @@ export function useFreehandDraw(stage: Stage | null, props: UseFreehandDrawProps
 		}
 
 		function startDrawing(position: Point) {
+			console.debug('[FreehandDraw] Starting new path')
+			const startTime = performance.now()
       if (!stage) return
 			if (currentPath) return
 
 			const path = new PathInstance(
+        null,
 				[position],
 				"raw",
 				undefined,
@@ -66,16 +69,20 @@ export function useFreehandDraw(stage: Stage | null, props: UseFreehandDrawProps
 			)
 			setCurrentPath(path)
 			setInitialInkForCurrentPath(props.ink?.remaining ?? 0)
+			console.debug(`[FreehandDraw] Path creation took ${performance.now() - startTime}ms`)
 		}
 
 		function continueDrawing(position: Point) {
+			const startTime = performance.now()
 			if (!currentPath) return
 
 			const updatedPath = currentPath.appended(position)
 			setCurrentPath(updatedPath)
+			console.debug(`[FreehandDraw] Path update took ${performance.now() - startTime}ms`)
 
 			if (!props.ink || initialInkForCurrentPath === null) return
 
+			const inkCalcStart = performance.now()
 			const pathLength = updatedPath.points.reduce((acc, point, index) => {
 				if (index === 0) return acc
 				const prevPoint = updatedPath.points[index - 1]
@@ -86,12 +93,17 @@ export function useFreehandDraw(stage: Stage | null, props: UseFreehandDrawProps
 			const inkUsed = Math.min(pathLength / props.ink?.maximum, initialInkForCurrentPath)
 			const newInkLevel = Math.max(0, initialInkForCurrentPath - inkUsed)
 			props.ink.onInkChange(newInkLevel)
+			console.debug(`[FreehandDraw] Ink calculation took ${performance.now() - inkCalcStart}ms`)
 		}
 
 		function finishDrawing() {
+			const startTime = performance.now()
 			if (!currentPath) return
 
+			const simplifyStart = performance.now()
 			const currentPathSimplified = currentPath.simplified()
+			console.debug(`[FreehandDraw] Path simplification took ${performance.now() - simplifyStart}ms`)
+			
 			setCurrentPath(null)
 
 			if (props.ink && initialInkForCurrentPath) {
@@ -106,6 +118,7 @@ export function useFreehandDraw(stage: Stage | null, props: UseFreehandDrawProps
 
 			setPaths([...paths, currentPathSimplified])
 			props.onPathCommitted?.(currentPathSimplified)
+			console.debug(`[FreehandDraw] Total path completion took ${performance.now() - startTime}ms`)
 		}
 
 		function handleMouseDown(e: KonvaEventObject<MouseEvent>) {

@@ -1,6 +1,6 @@
 import { useAccount, useCoState } from "jazz-react"
 import type { Stage } from "konva/lib/Stage"
-import { useMemo, useRef } from "react"
+import { useMemo, useRef, useEffect } from "react"
 import * as Konva from "react-konva"
 import { MAX_INK } from "../../drawing/constants"
 import { PathInstance } from "../../drawing/path"
@@ -55,6 +55,7 @@ function Canvas(props: CanvasProps) {
 		},
 		onPathCommitted: (path) => {
 			myWorkspace?.paths?.push({
+        id: path.id,
 				points: path.points,
 				scale: stageScale,
 			})
@@ -67,28 +68,45 @@ function Canvas(props: CanvasProps) {
 	const remotePaths = (globalContainer?.workspaces ?? [])?.flatMap((workspace) => {
 		return (workspace?.paths ?? []).map(
 			(jazzPath) =>
-				new PathInstance(jazzPath.points, "simplified", workspace.color, jazzPath.scale),
+				new PathInstance(jazzPath.id, jazzPath.points, "simplified", workspace.color, jazzPath.scale),
 		)
 	})
 
 	// All SVG paths (memoized)
-	const renderedPaths = useMemo(() => {
-		const allPaths = [...remotePaths, ...localPaths, currentPath].filter(Boolean) as PathInstance[]
+  // ⚠️ NOTE: We memo-ize based on remotePaths.length, because remotePaths are immutable.
+  //          The correct solution for this is to memo-ize `remotePaths` above, 
+  //          but I don't really grok how memoization works with Jazz CoValues.
+	// biome-ignore lint/correctness/useExhaustiveDependencies: @see above.\
+	const existingRenderedPaths = useMemo(() => {
+		const startTime = performance.now()
+    // Unique all paths, so we don't have duplicates between remote and local state.
+		const allPaths = [...new Map([...remotePaths, ...localPaths].map(path => [path.id, path])).values()]
 
-		return allPaths.map((path) => ({
+		const paths = allPaths.map((path) => ({
 			id: path.id,
 			svg: path.beautified().renderToSVGPath(),
 			fill: path.color ?? myWorkspace?.color ?? "#000000",
 		}))
-	}, [remotePaths, localPaths, currentPath, myWorkspace?.color])
+		console.debug(`[Canvas] SVG path rendering took ${performance.now() - startTime}ms for ${paths.length} paths`)
+		return paths
+	}, [remotePaths.length, localPaths, myWorkspace?.color])
+
+	const renderedCurrentPath = currentPath ? {
+		id: currentPath.id,
+		svg: currentPath.beautified().renderToSVGPath(),
+		fill: myWorkspace?.color ?? "#000000"
+	} : null
 
 	const onResetInk = () => {
+		console.debug('[Canvas] Resetting ink')
+		const startTime = performance.now()
 		if (!myWorkspace) return
 		// Remote state
 		myWorkspace.paths?.splice(0, myWorkspace.paths.length)
 		myWorkspace.remainingInk = MAX_INK
 		// Local state
 		clearPaths()
+		console.debug(`[Canvas] Ink reset took ${performance.now() - startTime}ms`)
 	}
 
 	return (
@@ -109,13 +127,22 @@ function Canvas(props: CanvasProps) {
 				y={stagePos[1]}
 			>
 				<Konva.Layer>
-					{renderedPaths.map(({ id, svg, fill }) => (
+					{existingRenderedPaths.map(({ id, svg, fill }) => (
 						<Konva.Path key={id} data={svg} fill={fill} />
 					))}
+					{renderedCurrentPath && (
+						<Konva.Path 
+							key={renderedCurrentPath.id} 
+							data={renderedCurrentPath.svg} 
+							fill={renderedCurrentPath.fill} 
+						/>
+					)}
 				</Konva.Layer>
 			</Konva.Stage>
 		</div>
 	)
 }
+
+Canvas.whyDidYouRender = true
 
 export default Canvas

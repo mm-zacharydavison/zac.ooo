@@ -9,6 +9,10 @@ export const Point = z.tuple([z.number(), z.number()])
  * A 2D path (x,y).
  */
 export const Path = z.object({
+  /**
+   * A unique id for this path.
+   */
+  id: z.string(),
 	/** The points of the path. */
 	points: z.array(Point),
 	/** The scale this path should be drawn at. */
