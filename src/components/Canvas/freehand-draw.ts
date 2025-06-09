@@ -6,18 +6,40 @@ import { PathInstance, type Point } from "../../drawing/path"
 const LEFT_CLICK_BUTTON_ID = 0
 
 interface UseFreehandDraw {
+  /**
+   * A list of paths managed by this hook.
+   * 
+   * @see `onPathCommitted` if you want to manage the paths yourself in some other state.
+   */
 	paths: PathInstance[]
+  /**
+   * The path currently being drawn.
+   */
 	currentPath: PathInstance | null
+  /**
+   * Remove all paths managed by this hook.
+   */
 	clearPaths: () => void
 }
 
 interface UseFreehandDrawProps {
+  /**
+   * If set, ink will be limited.
+   */
 	ink?: {
 		remaining: number
 		maximum: number
+    /** Whenever ink drains, this will be called. */
 		onInkChange: (newInk: number) => void
 	}
-	onPathCommitted?: (path: PathInstance) => void
+  /**
+   * Called when a path is completed (mouseup) and should be committed.
+   *
+   * Your implementation should return `true` if the commit was successful.
+   *
+   * If not set, this hook will not manage any `path` values internally itself.
+   */
+	onPathCommitted?: (path: PathInstance) => boolean
 }
 
 /**
@@ -116,8 +138,12 @@ export function useFreehandDraw(stage: Stage | null, props: UseFreehandDrawProps
       // To avoid noisy accidental taps on mobile, don't commit paths with less than 2 points.
       if (currentPathSimplified.points.length < 2) return
 
-			setPaths([...paths, currentPathSimplified])
-			props.onPathCommitted?.(currentPathSimplified)
+      // If the path was separately committed (e.g. to Jazz state), we don't need to maintain it ourselves.
+      // Only update our internal paths if nobody else is handling the committing.
+      if (!props.onPathCommitted?.(currentPathSimplified)) {
+        setPaths([...paths, currentPathSimplified])
+      }
+
 			console.debug(`[FreehandDraw] Total path completion took ${performance.now() - startTime}ms`)
 		}
 

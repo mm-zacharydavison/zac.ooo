@@ -40,7 +40,6 @@ function Canvas(props: CanvasProps) {
 	// Canvas features
 	const [stagePos, stageScale] = usePanAndZoom(konvaStage.current)
 	const {
-		paths: localPaths,
 		currentPath,
 		clearPaths,
 	} = useFreehandDraw(konvaStage.current, {
@@ -49,16 +48,19 @@ function Canvas(props: CanvasProps) {
 			maximum: MAX_INK,
 			onInkChange: (newInk) => {
 				if (myWorkspace) {
+          // Persist the users new ink value.
 					myWorkspace.remainingInk = newInk
 				}
 			},
 		},
 		onPathCommitted: (path) => {
+      // Persist the path to Jazz state.
 			myWorkspace?.paths?.push({
         id: path.id,
 				points: path.points,
 				scale: stageScale,
 			})
+      return true
 		},
 	})
 
@@ -79,17 +81,15 @@ function Canvas(props: CanvasProps) {
 	// biome-ignore lint/correctness/useExhaustiveDependencies: @see above.\
 	const existingRenderedPaths = useMemo(() => {
 		const startTime = performance.now()
-    // Unique all paths, so we don't have duplicates between remote and local state.
-		const allPaths = [...new Map([...remotePaths, ...localPaths].map(path => [path.id, path])).values()]
 
-		const paths = allPaths.map((path) => ({
+		const paths = remotePaths.map((path) => ({
 			id: path.id,
 			svg: path.beautified().renderToSVGPath(),
 			fill: path.color ?? myWorkspace?.color ?? "#000000",
 		}))
 		console.debug(`[Canvas] SVG path rendering took ${performance.now() - startTime}ms for ${paths.length} paths`)
 		return paths
-	}, [remotePaths.length, localPaths, myWorkspace?.color])
+	}, [remotePaths.length, myWorkspace?.color])
 
 	const renderedCurrentPath = currentPath ? {
 		id: currentPath.id,
