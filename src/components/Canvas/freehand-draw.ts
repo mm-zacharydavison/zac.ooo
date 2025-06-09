@@ -1,153 +1,220 @@
-import type { KonvaEventObject } from "konva/lib/Node";
-import type { Stage } from "konva/lib/Stage";
-import { useState, useEffect } from "react";
-import { PathInstance, type Point } from "../../drawing/path";
+import type { KonvaEventObject } from "konva/lib/Node"
+import type { Stage } from "konva/lib/Stage"
+import { useEffect, useState } from "react"
+import { PathInstance, type Point } from "../../drawing/path"
 
-const LEFT_CLICK_BUTTON_ID = 0;
+const LEFT_CLICK_BUTTON_ID = 0
 
 interface UseFreehandDraw {
-	paths: PathInstance[];
-	currentPath: PathInstance | null;
-	clearPaths: () => void;
+	paths: PathInstance[]
+	currentPath: PathInstance | null
+	clearPaths: () => void
 }
 
 interface UseFreehandDrawProps {
 	ink?: {
-		remaining: number;
-		maximum: number;
-    onInkChange: (newInk: number) => void;
-	};
-	onPathCommitted?: (path: PathInstance) => void;
+		remaining: number
+		maximum: number
+		onInkChange: (newInk: number) => void
+	}
+	onPathCommitted?: (path: PathInstance) => void
 }
 
 /**
  * Installs freehand drawing functionality into a Konva.Stage.
- * @param stage
+ * Supports both mouse and touch input.
  */
-export function useFreehandDraw(
-	stage: Stage | null,
-	props: UseFreehandDrawProps,
-): UseFreehandDraw {
+export function useFreehandDraw(stage: Stage | null, props: UseFreehandDrawProps): UseFreehandDraw {
 	// Path state
-	const [paths, setPaths] = useState<PathInstance[]>([]);
-	const [currentPath, setCurrentPath] = useState<PathInstance | null>(null);
+	const [paths, setPaths] = useState<PathInstance[]>([])
+	const [currentPath, setCurrentPath] = useState<PathInstance | null>(null)
 	// Ink state
 	const [initialInkForCurrentPath, setInitialInkForCurrentPath] = useState(
 		props.ink?.remaining ?? null,
-	);
+	)
 
 	const clearPaths = () => {
-		setPaths([]);
-		setCurrentPath(null);
-	};
+		setPaths([])
+		setCurrentPath(null)
+	}
 
 	useEffect(() => {
-		if (!stage) return;
+		if (!stage) return
 
-		/**
-		 * Converts the position of a mouse event to a relative position on the Konva.Canvas
-		 * @param e - The mouse event.
-		 * @returns A point within the Konva.Canvas (or null if the position was outside the stage)
-		 */
-		function convertMousePositionToCanvasPosition(
-			e: KonvaEventObject<MouseEvent>,
-		): Point | null {
-			const position = e.target.getStage()?.getPointerPosition();
-			if (!position) return null;
+    /**
+     * Convert a mouse or touch position to a canvas relative position.
+     * @param pos - The mouse or touch position.
+     * @returns A Point [x: number, y: number]
+     */
+		function convertPositionToCanvasPosition(pos: { x: number, y: number }): Point | null {
+			if (!stage) return null
 
-			const stage = e.target.getStage();
-			if (!stage) return null;
-
-			const transform = stage.getAbsoluteTransform().copy().invert();
-			const canvasPos = transform.point(position);
-			return [canvasPos.x, canvasPos.y];
+			const transform = stage.getAbsoluteTransform().copy().invert()
+			const canvasPos = transform.point(pos)
+			return [canvasPos.x, canvasPos.y]
 		}
 
-		function handleMouseDown(e: KonvaEventObject<MouseEvent>) {
+		function startDrawing(position: Point) {
       if (!stage) return
-			if (e.evt.button !== LEFT_CLICK_BUTTON_ID) return;
-			if (currentPath) return;
-
-			const position = convertMousePositionToCanvasPosition(e);
-			if (!position) return;
+			if (currentPath) return
 
 			const path = new PathInstance(
 				[position],
 				"raw",
 				undefined,
-				stage.scale().x, // x.y scale are identical
-			);
-			setCurrentPath(path);
-			setInitialInkForCurrentPath(props.ink?.remaining ?? 0);
+				stage.scale().x
+			)
+			setCurrentPath(path)
+			setInitialInkForCurrentPath(props.ink?.remaining ?? 0)
 		}
 
-		function handleMouseMove(e: KonvaEventObject<MouseEvent>) {
-      if (!stage) return
-			if (!currentPath) return;
+		function continueDrawing(position: Point) {
+			if (!currentPath) return
 
-			const position = convertMousePositionToCanvasPosition(e);
-			if (!position) return;
+			const updatedPath = currentPath.appended(position)
+			setCurrentPath(updatedPath)
 
-			const updatedPath = currentPath.appended(position);
-			setCurrentPath(updatedPath);
+			if (!props.ink || initialInkForCurrentPath === null) return
 
-			// Don't measure ink unless we're configured to.
-			if (!props.ink || initialInkForCurrentPath === null) return;
-
-			// Calculate ink usage in real-time
 			const pathLength = updatedPath.points.reduce((acc, point, index) => {
-				if (index === 0) return acc;
-				const prevPoint = updatedPath.points[index - 1];
-				const distance = Math.sqrt(
-					(point[0] - prevPoint[0]) ** 2 + (point[1] - prevPoint[1]) ** 2,
-				);
-				return acc + distance;
-			}, 0);
+				if (index === 0) return acc
+				const prevPoint = updatedPath.points[index - 1]
+				const distance = Math.sqrt((point[0] - prevPoint[0]) ** 2 + (point[1] - prevPoint[1]) ** 2)
+				return acc + distance
+			}, 0)
 
-			const inkUsed = Math.min(
-				pathLength / props.ink?.maximum,
-				initialInkForCurrentPath,
-			);
-			const newInkLevel = Math.max(0, initialInkForCurrentPath - inkUsed);
-			props.ink.onInkChange(newInkLevel);
+			const inkUsed = Math.min(pathLength / props.ink?.maximum, initialInkForCurrentPath)
+			const newInkLevel = Math.max(0, initialInkForCurrentPath - inkUsed)
+			props.ink.onInkChange(newInkLevel)
 		}
 
-		function handleMouseUp(e: KonvaEventObject<MouseEvent>) {
-      if (!stage) return
-			if (e.evt.button !== LEFT_CLICK_BUTTON_ID) return;
-			if (!currentPath) return;
+		function finishDrawing() {
+			if (!currentPath) return
 
-			// We want to commit the currentPath as simplified, for performance / data size.
-			const currentPathSimplified = currentPath.simplified();
-			setCurrentPath(null);
+			const currentPathSimplified = currentPath.simplified()
+			setCurrentPath(null)
 
 			if (props.ink && initialInkForCurrentPath) {
 				if (props.ink.remaining <= 0) {
-					// If no ink left, restore the initial ink level since path won't be saved.
-          props.ink.onInkChange(initialInkForCurrentPath);
-					return;
+					props.ink.onInkChange(initialInkForCurrentPath)
+					return
 				}
 			}
 
-			setPaths([...paths, currentPathSimplified]);
-			props.onPathCommitted?.(currentPathSimplified);
+      // To avoid noisy accidental taps on mobile, don't commit paths with less than 4 points.
+      if (currentPathSimplified.points.length < 4) return
+
+			setPaths([...paths, currentPathSimplified])
+			props.onPathCommitted?.(currentPathSimplified)
 		}
 
-		stage.on("mousedown", handleMouseDown);
-		stage.on("mousemove", handleMouseMove);
-		stage.on("mouseup", handleMouseUp);
+		function handleMouseDown(e: KonvaEventObject<MouseEvent>) {
+			if (e.evt.button !== LEFT_CLICK_BUTTON_ID) return
 
-    // Cleanup
+      const stage = e.target.getStage()
+      if(!stage) return
+
+			const position = stage.getPointerPosition()
+			if (!position) return
+
+			const canvasPos = convertPositionToCanvasPosition(position)
+			if (!canvasPos) return
+
+			startDrawing(canvasPos)
+		}
+
+		function handleMouseMove(e: KonvaEventObject<MouseEvent>) {
+      const stage = e.target.getStage()
+      if(!stage) return
+
+			const position = stage.getPointerPosition()
+			if (!position) return
+
+			const canvasPos = convertPositionToCanvasPosition(position)
+			if (!canvasPos) return
+
+			continueDrawing(canvasPos)
+		}
+
+		function handleMouseUp(e: KonvaEventObject<MouseEvent>) {
+			if (e.evt.button !== LEFT_CLICK_BUTTON_ID) return
+			finishDrawing()
+		}
+
+		function handleTouchStart(e: KonvaEventObject<TouchEvent>) {
+			e.evt.preventDefault()
+			
+      const stage = e.target.getStage()
+			const touch = e.evt.touches[0]
+			if (!stage || !touch) return
+
+			const position = stage.getPointerPosition()
+			if (!position) return
+
+			const canvasPos = convertPositionToCanvasPosition(position)
+			if (!canvasPos) return
+
+			startDrawing(canvasPos)
+		}
+
+		function handleTouchMove(e: KonvaEventObject<TouchEvent>) {
+			e.evt.preventDefault()
+
+      // Since 2 fingers are used for pan/zoom, do nothing if we have more than 1 touch.
+      if(e.evt.touches.length > 1) return
+
+      const stage = e.target.getStage()
+      if(!stage) return
+
+			const position = stage.getPointerPosition()
+			if (!position) return
+
+			const canvasPos = convertPositionToCanvasPosition(position)
+			if (!canvasPos) return
+
+			continueDrawing(canvasPos)
+		}
+
+		function handleTouchEnd(e: KonvaEventObject<TouchEvent>) {
+			e.evt.preventDefault()
+			finishDrawing()
+		}
+
+		stage.on("mousedown", handleMouseDown)
+		stage.on("mousemove", handleMouseMove)
+		stage.on("mouseup", handleMouseUp)
+		stage.on("touchstart", handleTouchStart)
+		stage.on("touchmove", handleTouchMove)
+		stage.on("touchend", handleTouchEnd)
+
+    // Prevent default scrolling on mobile
+    const container = stage.container()
+    container.style.touchAction = 'none'
+    
+    const preventScroll = (e: TouchEvent) => {
+      e.preventDefault()
+    }
+    
+    container.addEventListener('touchstart', preventScroll, { passive: false })
+    container.addEventListener('touchmove', preventScroll, { passive: false })
+    container.addEventListener('touchend', preventScroll, { passive: false })
+
 		return () => {
-			stage.off("mousedown", handleMouseDown);
-			stage.off("mousemove", handleMouseMove);
-			stage.off("mouseup", handleMouseUp);
-		};
-	}, [stage, currentPath, paths, initialInkForCurrentPath, props.ink, props.onPathCommitted]);
+			stage.off("mousedown", handleMouseDown)
+			stage.off("mousemove", handleMouseMove)
+			stage.off("mouseup", handleMouseUp)
+			stage.off("touchstart", handleTouchStart)
+			stage.off("touchmove", handleTouchMove)
+			stage.off("touchend", handleTouchEnd)
+      container.removeEventListener('touchstart', preventScroll)
+      container.removeEventListener('touchmove', preventScroll)
+      container.removeEventListener('touchend', preventScroll)
+		}
+	}, [stage, currentPath, paths, initialInkForCurrentPath, props.ink, props.onPathCommitted])
 
 	return {
 		paths,
 		currentPath,
 		clearPaths,
-	};
+	}
 }

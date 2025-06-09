@@ -1,12 +1,12 @@
-import * as perfect from "perfect-freehand";
-import { Simplify } from "simplify-ts";
-import { uuidv7 } from "uuidv7";
-import type { HexColorString } from "../jazz/aliases";
+import * as perfect from "perfect-freehand"
+import { Simplify } from "simplify-ts"
+import { uuidv7 } from "uuidv7"
+import type { HexColorString } from "../jazz/aliases"
 
 /**
  * A 2D point in space.
  */
-export type Point = [x: number, y: number];
+export type Point = [x: number, y: number]
 
 /**
  * An SVG path string.
@@ -15,16 +15,16 @@ export type Point = [x: number, y: number];
  *
  * @see https://css-tricks.com/svg-path-syntax-illustrated-guide/
  */
-export type SVGPathString = string;
+export type SVGPathString = string
 
 /**
  * - raw: A set of raw points that haven't been modified in any way.
  * - simplified: A simplified set of points, most suitable for storage.
  * - beautified: A complex, 'filled' path of points, generated from perfect-freehand, most suitable for rendering to look good.
  */
-export type PathType = "raw" | "simplified" | "beautified";
+export type PathType = "raw" | "simplified" | "beautified"
 
-const average = (a: number, b: number) => (a + b) / 2;
+const average = (a: number, b: number) => (a + b) / 2
 
 /**
  * A path in zac.ooo.
@@ -39,31 +39,26 @@ export class PathInstance {
 	 *
 	 * Useful for rendering.
 	 */
-	public readonly id = uuidv7();
-	public readonly points: Point[];
+	public readonly id = uuidv7()
+	public readonly points: Point[]
 
 	/**
 	 * A desired color for this path, if any.
 	 */
-	public readonly color?: HexColorString;
-	public type: PathType;
+	public readonly color?: HexColorString
+	public type: PathType
 
 	/**
 	 * The scale at which this path was drawn.
 	 * Used to maintain constant stroke width regardless of zoom level.
 	 */
-	public readonly scale: number;
+	public readonly scale: number
 
-	constructor(
-		points: Point[] = [],
-		type: PathType = "raw",
-		color?: HexColorString,
-		scale = 1,
-	) {
-		this.points = points;
-		this.type = type;
-		this.color = color;
-		this.scale = scale;
+	constructor(points: Point[] = [], type: PathType = "raw", color?: HexColorString, scale = 1) {
+		this.points = points
+		this.type = type
+		this.color = color
+		this.scale = scale
 	}
 
 	/**
@@ -72,12 +67,7 @@ export class PathInstance {
 	 * @returns A new path object with the point appended.
 	 */
 	appended(point: Point): PathInstance {
-		return new PathInstance(
-			[...this.points, point],
-			this.type,
-			this.color,
-			this.scale,
-		);
+		return new PathInstance([...this.points, point], this.type, this.color, this.scale)
 	}
 
 	/**
@@ -85,7 +75,7 @@ export class PathInstance {
 	 * @returns A new, simplified path.
 	 */
 	simplified(): PathInstance {
-		const tolerance = 0.3;
+		const tolerance = 0.3
 
 		return new PathInstance(
 			Simplify(
@@ -96,7 +86,7 @@ export class PathInstance {
 			"simplified",
 			this.color,
 			this.scale,
-		);
+		)
 	}
 
 	/**
@@ -109,8 +99,8 @@ export class PathInstance {
 	 * @returns A new, beautified path.
 	 */
 	beautified(): PathInstance {
-		const baseSize = 4; // Base stroke width in pixels
-		const adjustedSize = baseSize / this.scale; // Adjust size inversely to scale
+		const baseSize = 4 // Base stroke width in pixels
+		const adjustedSize = baseSize / this.scale // Adjust size inversely to scale
 
 		return new PathInstance(
 			perfect.getStroke(this.points, {
@@ -122,7 +112,7 @@ export class PathInstance {
 			"beautified",
 			this.color,
 			this.scale,
-		);
+		)
 	}
 
 	/**
@@ -130,32 +120,26 @@ export class PathInstance {
 	 * @returns A string representing the path as SVG.
 	 */
 	renderToSVGPath(): SVGPathString {
-		const len = this.points.length;
+		const len = this.points.length
 
 		if (len < 4) {
-			return "";
+			return ""
 		}
 
-		let a = this.points[0];
-		let b = this.points[1];
-		const c = this.points[2];
+		let a = this.points[0]
+		let b = this.points[1]
+		const c = this.points[2]
 
 		let result = `M${a[0].toFixed(2)},${a[1].toFixed(2)} Q${b[0].toFixed(
 			2,
-		)},${b[1].toFixed(2)} ${average(b[0], c[0]).toFixed(2)},${average(
-			b[1],
-			c[1],
-		).toFixed(2)} T`;
+		)},${b[1].toFixed(2)} ${average(b[0], c[0]).toFixed(2)},${average(b[1], c[1]).toFixed(2)} T`
 
 		for (let i = 2, max = len - 1; i < max; i++) {
-			a = this.points[i];
-			b = this.points[i + 1];
-			result += `${average(a[0], b[0]).toFixed(2)},${average(
-				a[1],
-				b[1],
-			).toFixed(2)} `;
+			a = this.points[i]
+			b = this.points[i + 1]
+			result += `${average(a[0], b[0]).toFixed(2)},${average(a[1], b[1]).toFixed(2)} `
 		}
 
-		return result;
+		return result
 	}
 }

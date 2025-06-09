@@ -1,2 +1,1 @@
-export const apiKey =
-	import.meta.env.VITE_JAZZ_API_KEY || "development@zac.ooo";
+export const apiKey = import.meta.env.VITE_JAZZ_API_KEY || "development@zac.ooo"

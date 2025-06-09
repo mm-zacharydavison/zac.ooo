@@ -1,5 +1,5 @@
-import { defineConfig, devices } from "@playwright/test";
-import isCI from "is-ci";
+import { defineConfig, devices } from "@playwright/test"
+import isCI from "is-ci"
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -43,4 +43,4 @@ export default defineConfig({
 			reuseExistingServer: !isCI,
 		},
 	],
-});
+})

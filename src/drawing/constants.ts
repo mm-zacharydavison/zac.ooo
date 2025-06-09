@@ -1,4 +1,4 @@
 /**
  * Maximum allowed ink.
  */
-export const MAX_INK = 250;
+export const MAX_INK = 250
