@@ -14,6 +14,7 @@ test.fixme("✅ The users pencil will stay at a constant width regardless of zoo
 test.fixme("✅ A user has a limited amount of ink.", () => {})
 test.fixme("✅ A user can see how much ink they have remaining.", () => {})
 test.fixme("✅ A user can click a button to erase their writing and get their ink back.", () => {})
+test.fixme("✅ Paths that are too small will not be committed, to avoid noise from mobile taps.", () => {})
 
 // Platform (Mobile)
 test.fixme('✅ All functions will work on mobile.', () => {})

@@ -103,20 +103,28 @@ export function usePanAndZoom(stage: Stage | null): [position: Point, scale: num
 					{ x: touches[0].clientX, y: touches[0].clientY },
 					{ x: touches[1].clientX, y: touches[1].clientY }
 				)
-				const oldScale = stageScale
-				const newScale = oldScale * (dist / lastDist)
-				const clampedScale = Math.max(0.01, Math.min(5, newScale))
-				setStageScale(clampedScale)
-				setLastDist(dist)
-
-				// Handle panning
 				const center = {
 					x: (touches[0].clientX + touches[1].clientX) / 2,
 					y: (touches[0].clientY + touches[1].clientY) / 2
 				}
+				const oldScale = stageScale
+				const newScale = oldScale * (dist / lastDist)
+				const clampedScale = Math.max(0.01, Math.min(5, newScale))
+
+				// Calculate new position to zoom towards fingers
+				let newPos: Point = [
+					center.x - (center.x - stagePos[0]) * (clampedScale / oldScale),
+					center.y - (center.y - stagePos[1]) * (clampedScale / oldScale),
+				]
+
+				// Add panning offset
 				const deltaX = center.x - lastPanPoint.x
 				const deltaY = center.y - lastPanPoint.y
-				setStagePos([stagePos[0] + deltaX, stagePos[1] + deltaY])
+				newPos = [newPos[0] + deltaX, newPos[1] + deltaY]
+
+				setStageScale(clampedScale)
+				setStagePos(newPos)
+				setLastDist(dist)
 				setLastPanPoint(center)
 			}
 		}

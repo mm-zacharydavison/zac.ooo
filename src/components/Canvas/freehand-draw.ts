@@ -101,6 +101,9 @@ export function useFreehandDraw(stage: Stage | null, props: UseFreehandDrawProps
 				}
 			}
 
+      // To avoid noisy accidental taps on mobile, don't commit paths with less than 4 points.
+      if (currentPathSimplified.points.length < 4) return
+
 			setPaths([...paths, currentPathSimplified])
 			props.onPathCommitted?.(currentPathSimplified)
 		}
