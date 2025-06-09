@@ -22,7 +22,7 @@ interface UseFreehandDrawProps {
 
 /**
  * Installs freehand drawing functionality into a Konva.Stage.
- * @param stage
+ * Supports both mouse and touch input.
  */
 export function useFreehandDraw(stage: Stage | null, props: UseFreehandDrawProps): UseFreehandDraw {
 	// Path state
@@ -41,55 +41,41 @@ export function useFreehandDraw(stage: Stage | null, props: UseFreehandDrawProps
 	useEffect(() => {
 		if (!stage) return
 
-		/**
-		 * Converts the position of a mouse event to a relative position on the Konva.Canvas
-		 * @param e - The mouse event.
-		 * @returns A point within the Konva.Canvas (or null if the position was outside the stage)
-		 */
-		function convertMousePositionToCanvasPosition(e: KonvaEventObject<MouseEvent>): Point | null {
-			const position = e.target.getStage()?.getPointerPosition()
-			if (!position) return null
-
-			const stage = e.target.getStage()
+    /**
+     * Convert a mouse or touch position to a canvas relative position.
+     * @param pos - The mouse or touch position.
+     * @returns A Point [x: number, y: number]
+     */
+		function convertPositionToCanvasPosition(pos: { x: number, y: number }): Point | null {
 			if (!stage) return null
 
 			const transform = stage.getAbsoluteTransform().copy().invert()
-			const canvasPos = transform.point(position)
+			const canvasPos = transform.point(pos)
 			return [canvasPos.x, canvasPos.y]
 		}
 
-		function handleMouseDown(e: KonvaEventObject<MouseEvent>) {
-			if (!stage) return
-			if (e.evt.button !== LEFT_CLICK_BUTTON_ID) return
+		function startDrawing(position: Point) {
+      if (!stage) return
 			if (currentPath) return
-
-			const position = convertMousePositionToCanvasPosition(e)
-			if (!position) return
 
 			const path = new PathInstance(
 				[position],
 				"raw",
 				undefined,
-				stage.scale().x, // x.y scale are identical
+				stage.scale().x
 			)
 			setCurrentPath(path)
 			setInitialInkForCurrentPath(props.ink?.remaining ?? 0)
 		}
 
-		function handleMouseMove(e: KonvaEventObject<MouseEvent>) {
-			if (!stage) return
+		function continueDrawing(position: Point) {
 			if (!currentPath) return
-
-			const position = convertMousePositionToCanvasPosition(e)
-			if (!position) return
 
 			const updatedPath = currentPath.appended(position)
 			setCurrentPath(updatedPath)
 
-			// Don't measure ink unless we're configured to.
 			if (!props.ink || initialInkForCurrentPath === null) return
 
-			// Calculate ink usage in real-time
 			const pathLength = updatedPath.points.reduce((acc, point, index) => {
 				if (index === 0) return acc
 				const prevPoint = updatedPath.points[index - 1]
@@ -102,18 +88,14 @@ export function useFreehandDraw(stage: Stage | null, props: UseFreehandDrawProps
 			props.ink.onInkChange(newInkLevel)
 		}
 
-		function handleMouseUp(e: KonvaEventObject<MouseEvent>) {
-			if (!stage) return
-			if (e.evt.button !== LEFT_CLICK_BUTTON_ID) return
+		function finishDrawing() {
 			if (!currentPath) return
 
-			// We want to commit the currentPath as simplified, for performance / data size.
 			const currentPathSimplified = currentPath.simplified()
 			setCurrentPath(null)
 
 			if (props.ink && initialInkForCurrentPath) {
 				if (props.ink.remaining <= 0) {
-					// If no ink left, restore the initial ink level since path won't be saved.
 					props.ink.onInkChange(initialInkForCurrentPath)
 					return
 				}
@@ -123,15 +105,107 @@ export function useFreehandDraw(stage: Stage | null, props: UseFreehandDrawProps
 			props.onPathCommitted?.(currentPathSimplified)
 		}
 
+		function handleMouseDown(e: KonvaEventObject<MouseEvent>) {
+			if (e.evt.button !== LEFT_CLICK_BUTTON_ID) return
+
+      const stage = e.target.getStage()
+      if(!stage) return
+
+			const position = stage.getPointerPosition()
+			if (!position) return
+
+			const canvasPos = convertPositionToCanvasPosition(position)
+			if (!canvasPos) return
+
+			startDrawing(canvasPos)
+		}
+
+		function handleMouseMove(e: KonvaEventObject<MouseEvent>) {
+      const stage = e.target.getStage()
+      if(!stage) return
+
+			const position = stage.getPointerPosition()
+			if (!position) return
+
+			const canvasPos = convertPositionToCanvasPosition(position)
+			if (!canvasPos) return
+
+			continueDrawing(canvasPos)
+		}
+
+		function handleMouseUp(e: KonvaEventObject<MouseEvent>) {
+			if (e.evt.button !== LEFT_CLICK_BUTTON_ID) return
+			finishDrawing()
+		}
+
+		function handleTouchStart(e: KonvaEventObject<TouchEvent>) {
+			e.evt.preventDefault()
+			
+      const stage = e.target.getStage()
+			const touch = e.evt.touches[0]
+			if (!stage || !touch) return
+
+			const position = stage.getPointerPosition()
+			if (!position) return
+
+			const canvasPos = convertPositionToCanvasPosition(position)
+			if (!canvasPos) return
+
+			startDrawing(canvasPos)
+		}
+
+		function handleTouchMove(e: KonvaEventObject<TouchEvent>) {
+			e.evt.preventDefault()
+
+      // Since 2 fingers are used for pan/zoom, do nothing if we have more than 1 touch.
+      if(e.evt.touches.length > 1) return
+
+      const stage = e.target.getStage()
+      if(!stage) return
+
+			const position = stage.getPointerPosition()
+			if (!position) return
+
+			const canvasPos = convertPositionToCanvasPosition(position)
+			if (!canvasPos) return
+
+			continueDrawing(canvasPos)
+		}
+
+		function handleTouchEnd(e: KonvaEventObject<TouchEvent>) {
+			e.evt.preventDefault()
+			finishDrawing()
+		}
+
 		stage.on("mousedown", handleMouseDown)
 		stage.on("mousemove", handleMouseMove)
 		stage.on("mouseup", handleMouseUp)
+		stage.on("touchstart", handleTouchStart)
+		stage.on("touchmove", handleTouchMove)
+		stage.on("touchend", handleTouchEnd)
 
-		// Cleanup
+    // Prevent default scrolling on mobile
+    const container = stage.container()
+    container.style.touchAction = 'none'
+    
+    const preventScroll = (e: TouchEvent) => {
+      e.preventDefault()
+    }
+    
+    container.addEventListener('touchstart', preventScroll, { passive: false })
+    container.addEventListener('touchmove', preventScroll, { passive: false })
+    container.addEventListener('touchend', preventScroll, { passive: false })
+
 		return () => {
 			stage.off("mousedown", handleMouseDown)
 			stage.off("mousemove", handleMouseMove)
 			stage.off("mouseup", handleMouseUp)
+			stage.off("touchstart", handleTouchStart)
+			stage.off("touchmove", handleTouchMove)
+			stage.off("touchend", handleTouchEnd)
+      container.removeEventListener('touchstart', preventScroll)
+      container.removeEventListener('touchmove', preventScroll)
+      container.removeEventListener('touchend', preventScroll)
 		}
 	}, [stage, currentPath, paths, initialInkForCurrentPath, props.ink, props.onPathCommitted])
 

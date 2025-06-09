@@ -6,7 +6,7 @@ import type { JazzId } from "./aliases"
 import { loadRootGroup } from "./group"
 
 const GLOBAL_GROUP_ID = import.meta.env.VITE_GROUP_ID
-const GLOBAL_CONTAINER_ID = "20250608194434_global-container"
+const GLOBAL_CONTAINER_ID = "20250609130615_global-container"
 
 /**
  * Loads (or initializes, if needed) the root object that stores state.

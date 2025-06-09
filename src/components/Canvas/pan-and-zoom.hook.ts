@@ -6,10 +6,8 @@ import type { Point } from "../../drawing/path"
 const MIDDLE_CLICK_BUTTON_ID = 1
 
 /**
- * Install middle-click panning functionality into a Konva.Stage.
- * @param stage
- * @return position: The x.y co-ordinates you should provide to your Konva.Stage element.
- *         scale: The scaleX.scaleY value you should provide to your Konva.Stage element.
+ * Install pan and zoom functionality into a Konva.Stage.
+ * Supports both mouse (middle-click pan, wheel zoom) and touch (drag pan, pinch zoom) interactions.
  */
 export function usePanAndZoom(stage: Stage | null): [position: Point, scale: number] {
 	const [stageScale, setStageScale] = useState(1)
@@ -18,9 +16,14 @@ export function usePanAndZoom(stage: Stage | null): [position: Point, scale: num
 		x: number
 		y: number
 	} | null>(null)
+	const [lastDist, setLastDist] = useState<number | null>(null)
 
 	useEffect(() => {
 		if (!stage) return
+
+		function getDistance(p1: { x: number, y: number }, p2: { x: number, y: number }) {
+			return Math.sqrt((p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2)
+		}
 
 		function handleMouseDown(e: KonvaEventObject<MouseEvent>) {
 			if (e.evt.button !== MIDDLE_CLICK_BUTTON_ID) return
@@ -61,13 +64,10 @@ export function usePanAndZoom(stage: Stage | null): [position: Point, scale: num
 
 			const scaleBy = 1.1
 			const newScale = e.evt.deltaY > 0 ? oldScale / scaleBy : oldScale * scaleBy
-
-			// Limit zoom range
 			const clampedScale = Math.max(0.01, Math.min(5, newScale))
 
 			setStageScale(clampedScale)
 
-			// Zoom towards pointer position
 			const newPos: Point = [
 				pointer.x - (pointer.x - stagePos[0]) * (clampedScale / oldScale),
 				pointer.y - (pointer.y - stagePos[1]) * (clampedScale / oldScale),
@@ -75,19 +75,75 @@ export function usePanAndZoom(stage: Stage | null): [position: Point, scale: num
 			setStagePos(newPos)
 		}
 
+		function handleTouchStart(e: KonvaEventObject<TouchEvent>) {
+			e.evt.preventDefault()
+			
+			const touches = e.evt.touches
+			if (touches.length === 2) {
+				// Store initial position for panning
+				setLastPanPoint({
+					x: (touches[0].clientX + touches[1].clientX) / 2,
+					y: (touches[0].clientY + touches[1].clientY) / 2
+				})
+				// Store initial distance for zooming
+				setLastDist(getDistance(
+					{ x: touches[0].clientX, y: touches[0].clientY },
+					{ x: touches[1].clientX, y: touches[1].clientY }
+				))
+			}
+		}
+
+		function handleTouchMove(e: KonvaEventObject<TouchEvent>) {
+			e.evt.preventDefault()
+			
+			const touches = e.evt.touches
+			if (touches.length === 2 && lastDist && lastPanPoint) {
+				// Handle zooming
+				const dist = getDistance(
+					{ x: touches[0].clientX, y: touches[0].clientY },
+					{ x: touches[1].clientX, y: touches[1].clientY }
+				)
+				const oldScale = stageScale
+				const newScale = oldScale * (dist / lastDist)
+				const clampedScale = Math.max(0.01, Math.min(5, newScale))
+				setStageScale(clampedScale)
+				setLastDist(dist)
+
+				// Handle panning
+				const center = {
+					x: (touches[0].clientX + touches[1].clientX) / 2,
+					y: (touches[0].clientY + touches[1].clientY) / 2
+				}
+				const deltaX = center.x - lastPanPoint.x
+				const deltaY = center.y - lastPanPoint.y
+				setStagePos([stagePos[0] + deltaX, stagePos[1] + deltaY])
+				setLastPanPoint(center)
+			}
+		}
+
+		function handleTouchEnd() {
+			setLastPanPoint(null)
+			setLastDist(null)
+		}
+
 		stage.on("mousedown", handleMouseDown)
 		stage.on("mousemove", handleMouseMove)
 		stage.on("mouseup", handleMouseUp)
 		stage.on("wheel", handleWheel)
+		stage.on("touchstart", handleTouchStart)
+		stage.on("touchmove", handleTouchMove)
+		stage.on("touchend", handleTouchEnd)
 
-		// Cleanup
 		return () => {
 			stage.off("mousedown", handleMouseDown)
 			stage.off("mousemove", handleMouseMove)
 			stage.off("mouseup", handleMouseUp)
 			stage.off("wheel", handleWheel)
+			stage.off("touchstart", handleTouchStart)
+			stage.off("touchmove", handleTouchMove)
+			stage.off("touchend", handleTouchEnd)
 		}
-	}, [stage, stagePos, lastPanPoint])
+	}, [stage, stagePos, lastPanPoint, stageScale, lastDist])
 
 	return [stagePos, stageScale]
 }

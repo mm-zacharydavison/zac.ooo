@@ -15,6 +15,11 @@ test.fixme("✅ A user has a limited amount of ink.", () => {})
 test.fixme("✅ A user can see how much ink they have remaining.", () => {})
 test.fixme("✅ A user can click a button to erase their writing and get their ink back.", () => {})
 
+// Platform (Mobile)
+test.fixme('✅ All functions will work on mobile.', () => {})
+test.fixme('✅ Panning will require two fingers on mobile.', () => {})
+test.fixme('✅ Zooming will use pinch gestures on mobile.', () => {})
+
 // Functionality (Audio)
 test.fixme("The user can select the audio clip tool from the tool menu.", () => {})
 test.fixme("The user can upload an audio clip and place it on the canvas.", () => {})

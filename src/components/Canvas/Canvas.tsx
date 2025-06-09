@@ -54,7 +54,6 @@ function Canvas(props: CanvasProps) {
 			},
 		},
 		onPathCommitted: (path) => {
-			console.log("path committed", path.id, myWorkspace?.id)
 			myWorkspace?.paths?.push({
 				points: path.points,
 				scale: stageScale,
@@ -71,8 +70,6 @@ function Canvas(props: CanvasProps) {
 				new PathInstance(jazzPath.points, "simplified", workspace.color, jazzPath.scale),
 		)
 	})
-
-	console.log("remotePaths", remotePaths)
 
 	// All SVG paths (memoized)
 	const renderedPaths = useMemo(() => {
