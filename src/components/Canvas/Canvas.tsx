@@ -1,6 +1,6 @@
 import { useAccount, useCoState } from "jazz-react"
 import type { Stage } from "konva/lib/Stage"
-import { useMemo, useRef, useEffect } from "react"
+import { useMemo, useRef } from "react"
 import * as Konva from "react-konva"
 import { MAX_INK } from "../../drawing/constants"
 import { PathInstance } from "../../drawing/path"
