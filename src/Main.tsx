@@ -5,7 +5,7 @@ import App from "./App.tsx";
 import "./index.css";
 import { apiKey } from "./apiKey.ts";
 import { AppAccount } from "./jazz/account.ts";
-import { JazzInspector } from "jazz-inspector";
+// import { JazzInspector } from "jazz-inspector";
 
 // This identifies the app in the passkey auth
 export const APPLICATION_NAME = "zac.ooo";
@@ -21,7 +21,7 @@ createRoot(document.getElementById("root")!).render(
 			AccountSchema={AppAccount}
 		>
 			<App />
-			<JazzInspector />
+			{/* <JazzInspector /> */}
 		</JazzProvider>
 	</StrictMode>,
 );
