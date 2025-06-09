@@ -1,4 +1,4 @@
-# [zac.ooo](zac.ooo)
+# [zac.ooo](http://zac.ooo)
 
 fun multiplayer whiteboard app
 
