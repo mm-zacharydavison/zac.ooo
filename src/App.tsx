@@ -1,7 +1,12 @@
-import { CanvasContainer } from "./CanvasContainer";
+import { CanvasContainer } from "./components/CanvasContainer";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 function App() {
-	return <CanvasContainer />;
+	return (
+		<ErrorBoundary>
+			<CanvasContainer />
+		</ErrorBoundary>
+	);
 }
 
 export default App;

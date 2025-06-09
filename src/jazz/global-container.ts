@@ -12,7 +12,7 @@ import type { JazzId } from "./aliases";
 import { loadRootGroup } from "./group";
 
 const GLOBAL_GROUP_ID = import.meta.env.VITE_GROUP_ID;
-const GLOBAL_CONTAINER_ID = "20250608194432_global-container";
+const GLOBAL_CONTAINER_ID = "20250608194434_global-container";
 
 /**
  * Loads (or initializes, if needed) the root object that stores state.
@@ -35,7 +35,7 @@ export async function loadRoot(
 
 	// Fetch the existing global container, if one exists.
 	let globalContainer = await GlobalContainer.load(globalContainerId, {
-		resolve: { workspaces: true },
+		resolve: { workspaces: { $each: { paths: true } } },
 	});
 
 	console.log(`Loaded GlobalContainer: ${globalContainer?.id}.`);
@@ -61,14 +61,16 @@ export async function loadRoot(
 			},
 			{ owner: group },
 		);
+		console.log(`Created new myWorkspace for user: '${me.id}'.`);
 		// Create this users root.
 		me.root = AccountRoot.create({
 			global: globalContainer,
 			myWorkspace,
 		});
+		console.log(`Created new root for user: '${me.id}'.`);
 		// Push their workspace onto the global workspaces list.
 		globalContainer.workspaces.push(myWorkspace);
-		console.log(`Created new root for user: '${me.id}'.`);
+		console.log(`Registered new workspace: '${myWorkspace.id}'.`);
 	}
 
 	return globalContainer.id;
