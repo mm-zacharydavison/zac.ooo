@@ -1,23 +1,23 @@
-import type { HexColorString } from "../jazz/aliases";
+import type { HexColorString } from "../jazz/aliases"
 
 interface InkBarProps {
 	/**
 	 * Current amount of ink.
 	 */
-	currentInk: number;
+	currentInk: number
 	/**
 	 * Maximum ink.
 	 */
-	maxInk: number;
+	maxInk: number
 	/**
 	 * The color of the ink.
 	 */
-	inkColor: HexColorString;
+	inkColor: HexColorString
 	/**
 	 * Callback for when the reset button is clicked.
 	 * @returns
 	 */
-	onResetInk: () => void;
+	onResetInk: () => void
 }
 
 /**
@@ -80,7 +80,7 @@ function InkBar({ currentInk, maxInk, inkColor, onResetInk }: InkBarProps) {
 				↻
 			</button>
 		</div>
-	);
+	)
 }
 
-export default InkBar;
+export default InkBar

@@ -1,13 +1,13 @@
-import { Component, type ErrorInfo, type ReactNode } from "react";
+import { Component, type ErrorInfo, type ReactNode } from "react"
 
 interface Props {
-	children: ReactNode;
+	children: ReactNode
 }
 
 interface State {
-	hasError: boolean;
-	error: Error | null;
-	errorInfo: ErrorInfo | null;
+	hasError: boolean
+	error: Error | null
+	errorInfo: ErrorInfo | null
 }
 
 export class ErrorBoundary extends Component<Props, State> {
@@ -15,18 +15,18 @@ export class ErrorBoundary extends Component<Props, State> {
 		hasError: false,
 		error: null,
 		errorInfo: null,
-	};
+	}
 
 	public static getDerivedStateFromError(error: Error): State {
-		return { hasError: true, error, errorInfo: null };
+		return { hasError: true, error, errorInfo: null }
 	}
 
 	public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-		console.error("ErrorBoundary caught an error:", error, errorInfo);
+		console.error("ErrorBoundary caught an error:", error, errorInfo)
 		this.setState({
 			error,
 			errorInfo,
-		});
+		})
 	}
 
 	public render() {
@@ -47,9 +47,9 @@ export class ErrorBoundary extends Component<Props, State> {
 						{this.state.errorInfo?.componentStack}
 					</details>
 				</div>
-			);
+			)
 		}
 
-		return this.props.children;
+		return this.props.children
 	}
 }

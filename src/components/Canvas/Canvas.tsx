@@ -1,14 +1,14 @@
-import { useAccount, useCoState } from "jazz-react";
-import type { Stage } from "konva/lib/Stage";
-import { useRef, useMemo } from "react";
-import * as Konva from "react-konva";
-import { MAX_INK } from "../../drawing/constants";
-import { PathInstance } from "../../drawing/path";
-import { AppAccount, GlobalContainer } from "../../jazz/account";
-import type { JazzId } from "../../jazz/aliases";
-import InkBar from "../InkBar";
-import { useFreehandDraw } from "./freehand-draw";
-import { usePanAndZoom } from "./pan-and-zoom.hook";
+import { useAccount, useCoState } from "jazz-react"
+import type { Stage } from "konva/lib/Stage"
+import { useMemo, useRef } from "react"
+import * as Konva from "react-konva"
+import { MAX_INK } from "../../drawing/constants"
+import { PathInstance } from "../../drawing/path"
+import { AppAccount, GlobalContainer } from "../../jazz/account"
+import type { JazzId } from "../../jazz/aliases"
+import InkBar from "../InkBar"
+import { useFreehandDraw } from "./freehand-draw"
+import { usePanAndZoom } from "./pan-and-zoom.hook"
 
 export interface CanvasProps {
 	/**
@@ -16,7 +16,7 @@ export interface CanvasProps {
 	 *
 	 * Will be loaded by the Canvas.
 	 */
-	globalContainerId: JazzId;
+	globalContainerId: JazzId
 }
 
 /**
@@ -26,81 +26,73 @@ export interface CanvasProps {
  * - Renders all other user canvases.
  */
 function Canvas(props: CanvasProps) {
-	const konvaStage = useRef<Stage>(null);
+	const konvaStage = useRef<Stage>(null)
 
 	const { me } = useAccount(AppAccount, {
 		resolve: { root: { myWorkspace: true } },
-	});
+	})
 
 	// Get the global container state (including all other user paths).
 	const globalContainer = useCoState(GlobalContainer, props.globalContainerId, {
 		resolve: { workspaces: { $each: { paths: true } } },
-	});
+	})
 
 	// Canvas features
-	const [stagePos, stageScale] = usePanAndZoom(konvaStage.current);
-	const { paths: localPaths, currentPath, clearPaths } = useFreehandDraw(
-		konvaStage.current,
-		{
-			ink: {
-				remaining: me?.root.myWorkspace.remainingInk ?? 0,
-				maximum: MAX_INK,
-        onInkChange: (newInk) => {
-          if (myWorkspace) {
-            myWorkspace.remainingInk = newInk
-          }
-        }
-			},
-			onPathCommitted: (path) => {
-        console.log('path committed', path.id, myWorkspace?.id)
-				myWorkspace?.paths?.push({
-					points: path.points,
-					scale: stageScale,
-				});
+	const [stagePos, stageScale] = usePanAndZoom(konvaStage.current)
+	const {
+		paths: localPaths,
+		currentPath,
+		clearPaths,
+	} = useFreehandDraw(konvaStage.current, {
+		ink: {
+			remaining: me?.root.myWorkspace.remainingInk ?? 0,
+			maximum: MAX_INK,
+			onInkChange: (newInk) => {
+				if (myWorkspace) {
+					myWorkspace.remainingInk = newInk
+				}
 			},
 		},
-	);
+		onPathCommitted: (path) => {
+			console.log("path committed", path.id, myWorkspace?.id)
+			myWorkspace?.paths?.push({
+				points: path.points,
+				scale: stageScale,
+			})
+		},
+	})
 
-	const myWorkspace = me?.root?.myWorkspace;
+	const myWorkspace = me?.root?.myWorkspace
 
 	// Remote paths
-	const remotePaths = (globalContainer?.workspaces ?? [])?.flatMap(
-		(workspace) => {
-			return (workspace?.paths ?? []).map(
-				(jazzPath) =>
-					new PathInstance(
-						jazzPath.points,
-						"simplified", 
-						workspace.color,
-						jazzPath.scale,
-					),
-			);
-		},
-	);
+	const remotePaths = (globalContainer?.workspaces ?? [])?.flatMap((workspace) => {
+		return (workspace?.paths ?? []).map(
+			(jazzPath) =>
+				new PathInstance(jazzPath.points, "simplified", workspace.color, jazzPath.scale),
+		)
+	})
 
-  console.log('remotePaths', remotePaths)
+	console.log("remotePaths", remotePaths)
 
 	// All SVG paths (memoized)
 	const renderedPaths = useMemo(() => {
-		const allPaths = [...remotePaths, ...localPaths, currentPath].filter(
-			Boolean,
-		) as PathInstance[];
-		
-		return allPaths.map(path => ({
+		const allPaths = [...remotePaths, ...localPaths, currentPath].filter(Boolean) as PathInstance[]
+
+		return allPaths.map((path) => ({
 			id: path.id,
 			svg: path.beautified().renderToSVGPath(),
-			fill: path.color ?? myWorkspace?.color ?? "#000000"
-		}));
-	}, [remotePaths, localPaths, currentPath, myWorkspace?.color]);
+			fill: path.color ?? myWorkspace?.color ?? "#000000",
+		}))
+	}, [remotePaths, localPaths, currentPath, myWorkspace?.color])
 
 	const onResetInk = () => {
-		if (!myWorkspace) return;
+		if (!myWorkspace) return
 		// Remote state
-		myWorkspace.paths?.splice(0, myWorkspace.paths.length);
-		myWorkspace.remainingInk = MAX_INK;
+		myWorkspace.paths?.splice(0, myWorkspace.paths.length)
+		myWorkspace.remainingInk = MAX_INK
 		// Local state
-		clearPaths();
-	};
+		clearPaths()
+	}
 
 	return (
 		<div style={{ position: "relative", width: "100vw", height: "100vh" }}>
@@ -121,16 +113,12 @@ function Canvas(props: CanvasProps) {
 			>
 				<Konva.Layer>
 					{renderedPaths.map(({ id, svg, fill }) => (
-						<Konva.Path
-							key={id}
-							data={svg}
-							fill={fill}
-						/>
+						<Konva.Path key={id} data={svg} fill={fill} />
 					))}
 				</Konva.Layer>
 			</Konva.Stage>
 		</div>
-	);
+	)
 }
 
-export default Canvas;
+export default Canvas

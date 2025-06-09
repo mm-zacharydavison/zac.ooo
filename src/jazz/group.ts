@@ -1,4 +1,4 @@
-import { type Account, Group, type ID } from "jazz-tools";
+import { type Account, Group, type ID } from "jazz-tools"
 
 /**
  * Creates a new root group.
@@ -13,11 +13,11 @@ import { type Account, Group, type ID } from "jazz-tools";
 function createRootGroup(me: Account) {
 	const group = Group.create({
 		owner: me,
-	});
-	group.addMember("everyone", "writer");
-	console.log(`Created group '${group.id}'.`);
-	console.log(`Add "VITE_GROUP_ID=${group.id}" to your .env file.`);
-	return group;
+	})
+	group.addMember("everyone", "writer")
+	console.log(`Created group '${group.id}'.`)
+	console.log(`Add "VITE_GROUP_ID=${group.id}" to your .env file.`)
+	return group
 }
 
 /**
@@ -28,14 +28,14 @@ function createRootGroup(me: Account) {
  */
 export async function loadRootGroup(me: Account, groupID?: ID<Group>) {
 	if (groupID === undefined) {
-		console.log("No group ID found, creating group...");
-		return createRootGroup(me);
+		console.log("No group ID found, creating group...")
+		return createRootGroup(me)
 	}
-	const group = await Group.load(groupID, {});
+	const group = await Group.load(groupID, {})
 	if (group === null || group === undefined) {
-		console.log("Group not found, creating group...");
-		return createRootGroup(me);
+		console.log("Group not found, creating group...")
+		return createRootGroup(me)
 	}
-	console.log(`Loaded group '${group.id}'.`);
-	return group;
+	console.log(`Loaded group '${group.id}'.`)
+	return group
 }
