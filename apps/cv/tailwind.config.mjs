@@ -10,13 +10,6 @@ export default {
 					"--rounded-box": "0.25rem",
 					"--rounded-btn": "0.2rem",
 					"--rounded-badge": "0.25rem"
-				},
-				black: {
-					...require("daisyui/src/theming/themes")["black"],
-					"--rounded-box": "0.25rem",
-					"--rounded-btn": "0.2rem",
-					"--rounded-badge": "0.25rem",
-					"secondary": "#e5e5e5"
 				}
 			}
 		],

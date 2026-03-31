@@ -34,22 +34,7 @@ const title = `${post.frontmatter.title} - ${about.frontmatter.name}`;
 
 <BaseLayout title={title} description={post.frontmatter.description}>
   <Header />
-  <div
-    class="flex items-center absolute top-14 right-4 md:top-6 md:right-6 lg:top-8 lg:right-8 xl:top-10 xl:right-10 z-10 print:hidden"
-  >
-    <Icon name="carbon:moon" class="w-4 h-4" />
-    <input
-      type="checkbox"
-      data-toggle-theme="black,lofi"
-      data-act-class="ACTIVECLASS"
-      class="toggle toggle-sm mx-1 bg-secondary"
-      checked
-      aria-label="Toggle theme"
-    />
-    <Icon name="carbon:light" class="w-4 h-4" />
-  </div>
-
-  <Nav />
+<Nav />
 
   <main class="mx-auto flex-grow max-w-3xl py-6 w-[95vw]">
     <a href="/blog" class="text-sm text-secondary hover:underline mb-4 inline-flex items-center gap-1">

@@ -1,6 +1,6 @@
 ---
 import "@fontsource-variable/dm-sans";
-import { themeChange } from "theme-change";
+
 import LinkTooltip from "../components/LinkTooltip.astro";
 
 interface Props {
@@ -24,17 +24,7 @@ const {
         <meta name="description" content={description} />
         <title>{title}</title>
         <script is:inline>
-            if (localStorage.getItem("theme") === null) {
-                document.documentElement.setAttribute("data-theme", "lofi");
-            } else
-                document.documentElement.setAttribute(
-                    "data-theme",
-                    localStorage.getItem("theme"),
-                );
-        </script>
-        <script>
-            import { themeChange } from "theme-change";
-            themeChange();
+            document.documentElement.setAttribute("data-theme", "lofi");
         </script>
     </head>
     <body class="min-h-screen">
@@ -244,10 +234,13 @@ const {
 
     .link-tooltip-img {
         display: block;
-        max-width: 240px;
+        width: 240px;
+        aspect-ratio: 1200 / 630;
         max-height: 160px;
+        object-fit: cover;
         border-radius: 0.2rem;
         margin: 0.25rem 0;
+        background: oklch(var(--bc) / 0.05);
     }
 
     .link-tooltip:has(.link-preview) {
@@ -267,10 +260,12 @@ const {
     .link-preview-img {
         display: block;
         width: 100%;
+        aspect-ratio: 1200 / 630;
         max-height: 120px;
         object-fit: cover;
         border-radius: 0.2rem;
         margin-bottom: 0.35rem;
+        background: oklch(var(--bc) / 0.05);
     }
 
     .link-preview-text {
