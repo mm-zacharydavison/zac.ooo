@@ -1,0 +1,37 @@
+package.json
+  2637f19ad34457ca 2-14
+ignore-vercel-build.js
+  2637f19ad34457ca 1-26
+apps/whiteboard/vercel.json
+  2637f19ad34457ca 4
+apps/cv/package.json
+  2637f19ad34457ca 2
+apps/cv/astro.config.mjs
+  2637f19ad34457ca 6,12
+.gitignore
+  2637f19ad34457ca 31-40
+apps/whiteboard/package.json
+  2637f19ad34457ca 2
+apps/cv/vercel.json
+  2637f19ad34457ca 3-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "585afb7015978534c27c25d88aaef9025b23604e",
+  "prompts": {
+    "2637f19ad34457ca": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1a2eda98-ea9c-4350-880c-d9fa718c2ceb",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zachary Davison <zac.developer@gmail.com>",
+      "messages": [],
+      "total_additions": 96,
+      "total_deletions": 66,
+      "accepted_lines": 76,
+      "overriden_lines": 0
+    }
+  }
+}
