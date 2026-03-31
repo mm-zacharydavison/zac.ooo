@@ -19,22 +19,26 @@ const contact = Object.values(
 ---
 
 <BaseLayout title={title}>
-  <Header />
-<Nav />
+  <div class="flex flex-col min-h-screen">
+    <Header />
+    <Nav />
 
-  <main class="mx-auto flex-grow max-w-3xl py-6 w-[95vw]">
-    <article class="prose text-justify max-w-none text-base-content/60">
-      <Fragment set:html={about.compiledContent()} />
-    </article>
+    <main class="mx-auto max-w-3xl py-6 w-[95vw]">
+      <article class="prose text-justify max-w-none text-base-content/60">
+        <Fragment set:html={about.compiledContent()} />
+      </article>
+    </main>
 
-    <div class="flex flex-wrap gap-4 justify-center mt-8">
-      {contact.map((item) => (
-        <ContactCard
-          url={item.frontmatter.url}
-          label={item.frontmatter.label}
-          icon={item.frontmatter.icon}
-        />
-      ))}
-    </div>
-  </main>
+    <footer class="mt-auto pb-8">
+      <div class="flex flex-wrap gap-4 justify-center">
+        {contact.map((item) => (
+          <ContactCard
+            url={item.frontmatter.url}
+            label={item.frontmatter.label}
+            icon={item.frontmatter.icon}
+          />
+        ))}
+      </div>
+    </footer>
+  </div>
 </BaseLayout>

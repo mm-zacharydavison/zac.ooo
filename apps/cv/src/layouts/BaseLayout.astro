@@ -183,7 +183,7 @@ const {
         padding: 0.35rem 0.6rem;
         font-size: 0.75rem;
         line-height: 1.4;
-        max-width: 260px;
+        max-width: 380px;
         background: oklch(var(--b1));
         color: oklch(var(--bc));
         border: 1px solid oklch(var(--bc) / 0.15);
@@ -234,17 +234,19 @@ const {
 
     .link-tooltip-img {
         display: block;
-        width: 240px;
+        width: 360px;
         aspect-ratio: 1200 / 630;
-        max-height: 160px;
+        max-height: 200px;
         object-fit: cover;
+        object-position: top;
         border-radius: 0.2rem;
         margin: 0.25rem 0;
         background: oklch(var(--bc) / 0.05);
+        image-rendering: high-quality;
     }
 
     .link-tooltip:has(.link-preview) {
-        max-width: 320px;
+        max-width: 400px;
     }
 
     .link-preview {
@@ -261,11 +263,13 @@ const {
         display: block;
         width: 100%;
         aspect-ratio: 1200 / 630;
-        max-height: 120px;
+        max-height: 180px;
         object-fit: cover;
+        object-position: top;
         border-radius: 0.2rem;
         margin-bottom: 0.35rem;
         background: oklch(var(--bc) / 0.05);
+        image-rendering: high-quality;
     }
 
     .link-preview-text {
