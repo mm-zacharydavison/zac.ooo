@@ -55,20 +55,18 @@ const contact = Object.values(
   function fitName() {
     const el = document.querySelector('.vcard-name') as HTMLElement;
     if (!el) return;
-    const parent = el.parentElement!;
-    const style = window.getComputedStyle(el);
-    let size = parseFloat(style.fontSize);
-    while (el.scrollWidth > parent.clientWidth && size > 8) {
+    const container = el.closest('.vcard-left') as HTMLElement;
+    if (!container) return;
+    el.style.fontSize = '';
+    const maxWidth = container.clientWidth;
+    let size = parseFloat(window.getComputedStyle(el).fontSize);
+    while (el.scrollWidth > maxWidth && size > 8) {
       size -= 0.5;
       el.style.fontSize = size + 'px';
     }
   }
   fitName();
-  window.addEventListener('resize', () => {
-    const el = document.querySelector('.vcard-name') as HTMLElement;
-    if (el) el.style.fontSize = '';
-    fitName();
-  });
+  window.addEventListener('resize', fitName);
 </script>
 </BaseLayout>
 
@@ -106,8 +104,6 @@ const contact = Object.values(
 
   .vcard-name {
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
   }
 
   .vcard-divider {
