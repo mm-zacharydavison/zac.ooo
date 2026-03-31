@@ -6,7 +6,7 @@ org: Various
 ---
 
 - Technology Architect @ [To Be A Machine](https://www.deadcentre.org/tobeamachine-2) (theatre, Jack Gleeson)
-- University Lecturer @ TU Dublin (part time, software engineering)
+- University Lecturer @ [TU Dublin](https://www.tudublin.ie/) (part time, software engineering)
 - iOS Freelancer since iOS 5.0.
   - [Soundwave](https://en.wikipedia.org/wiki/Soundwave_(app)) (Acquired by Spotify)
   - [FanFootage](https://sportstechireland.com/companies/fanfootage/)

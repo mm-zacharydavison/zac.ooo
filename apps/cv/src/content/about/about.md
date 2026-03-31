@@ -12,7 +12,7 @@ I'm an engineer with **14 years of experience** (9 in leadership) across a wide 
 I specialize in **platform engineering** and **developer experience**, building tooling, frameworks, and cloud platforms to enable developers to deliver higher quality software at scale, faster.
 
 
-I like solving **sociotechnical** problems, building systems to solve development pain-points with a path-of-least-resistance philosophy.
+I like solving **sociotechnical** problems, building systems to solve development pain-points in teams of engineers, with a path-of-least-resistance philosophy.
 
 
 I work globally with many languages and cultures, residing in Berlin since 2016.
