@@ -1,0 +1,171 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { Icon } from "astro-icon/components";
+import * as about from "../content/about/about.md";
+import QRCode from "qrcode";
+
+const title = `${about.frontmatter.name} - Business Card`;
+const qrSvg = (await QRCode.toString("https://zac.ooo", { type: "svg", margin: 0, color: { dark: "#000000", light: "#00000000" } })).replace(/fill="#000000"/g, 'fill="currentColor"');
+
+type MarkdownInstance = {
+  frontmatter: { title: string; url?: string; icon?: string; label?: string };
+};
+
+const contact = Object.values(
+  import.meta.glob("../content/contact/*.md", { eager: true })
+) as MarkdownInstance[];
+---
+
+<BaseLayout title={title}>
+  <div class="vcard-page">
+    <div class="vcard hatch-shadow">
+      <div class="vcard-inner">
+        <div class="vcard-main">
+          <h1 class="font-extrabold tracking-tight leading-none text-[1.4rem] md:text-[1.8rem]">
+            {about.frontmatter.name}
+          </h1>
+          <h2 class="text-xs md:text-sm text-secondary mt-1">
+            {about.frontmatter.designation}
+          </h2>
+          <div class="flex items-center mt-0.5">
+            <Icon name="carbon:location" class="w-3 h-3 mr-0.5 text-secondary" />
+            <span class="text-xs text-secondary">{about.frontmatter.location}</span>
+          </div>
+        </div>
+
+        <div class="vcard-divider"></div>
+
+        <div class="vcard-bottom">
+          <div class="vcard-contact">
+            {contact.map((item) => (
+              <span class="inline-flex items-center gap-1.5 text-xs">
+                <Icon name={item.frontmatter.icon} class="w-3.5 h-3.5 text-secondary" />
+                <span class="text-base-content/70">{item.frontmatter.label}</span>
+              </span>
+            ))}
+            {about.frontmatter.website && (
+              <span class="inline-flex items-center gap-1.5 text-xs">
+                <Icon name="carbon:globe" class="w-3.5 h-3.5 text-secondary" />
+                <span class="text-base-content/70">{about.frontmatter.website.replace(/^https?:\/\//, '')}</span>
+              </span>
+            )}
+          </div>
+          <div class="vcard-qr" set:html={qrSvg} />
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  .vcard-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  .vcard {
+    aspect-ratio: 3.5 / 2;
+    width: min(500px, 90vw);
+    border: 1px solid oklch(var(--s) / 0.4);
+    border-radius: var(--rounded-box, 0.25rem);
+    background: oklch(var(--b1));
+    display: flex;
+    align-items: stretch;
+  }
+
+  .vcard-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 2rem;
+    width: 100%;
+  }
+
+  .vcard-main {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .vcard-divider {
+    height: 1px;
+    background: repeating-linear-gradient(
+      45deg,
+      oklch(var(--s)) 0px,
+      oklch(var(--s)) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+    opacity: 0.4;
+    margin: 0.75rem 0;
+  }
+
+  .vcard-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  .vcard-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .vcard-qr {
+    flex-shrink: 0;
+    width: 4.5rem;
+    height: 4.5rem;
+    opacity: 0.7;
+  }
+
+  .vcard-qr :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Mobile: landscape card fills screen */
+  @media (max-width: 768px) {
+    .vcard-page {
+      min-height: 100dvh;
+      padding: 0.75rem;
+    }
+
+    .vcard {
+      width: calc(100dvw - 1.5rem);
+      height: calc(100dvh - 1.5rem);
+      aspect-ratio: auto;
+    }
+
+    .vcard-inner {
+      padding: 1.5rem;
+    }
+
+    .vcard-qr {
+      width: 8rem;
+      height: 8rem;
+    }
+  }
+
+  /* Force landscape on mobile touchscreens in portrait */
+  @media (max-width: 768px) and (orientation: portrait) and (pointer: coarse) {
+    .vcard-page {
+      min-height: 100dvw;
+      height: 100dvw;
+      width: 100dvh;
+      transform: rotate(90deg);
+      transform-origin: top left;
+      position: absolute;
+      top: 0;
+      left: 100dvw;
+      padding: 0.75rem;
+    }
+
+    .vcard {
+      width: calc(100dvh - 1.5rem);
+      height: calc(100dvw - 1.5rem);
+    }
+  }
+</style>
