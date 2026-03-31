@@ -6,7 +6,7 @@ location: "Berlin, Germany"
 website: "http://zac.ooo"
 ---
 
-I'm an engineer with **14 years of experience** (9 in leadership) across a wide range of projects (**full-stack**, **mobile**, **medical devices**, **theater installations**, many more).
+I'm an engineer with **14 years of experience** (9 in leadership) across a wide range of projects (**platform**, **full-stack**, **mobile**, **medical devices**, **theater installations**, many more).
 
 
 I specialize in **platform engineering** and **developer experience**, building tooling, frameworks, and cloud platforms to enable developers to deliver higher quality software at scale, faster.
@@ -18,7 +18,7 @@ I like solving **sociotechnical** problems, building systems to solve developmen
 I work globally with many languages and cultures, residing in Berlin since 2016.
 
 
-Lately I'm working on tooling, platforms, and libraries to enable AI, most of which is open source. 
+Lately I'm working on tooling, platforms, and libraries to enable AI, most of which are open source. 
 [`use-ai`](https://github.com/meetsmore/use-ai), [`boilerhouse`](https://github.com/zdavison/boilerhouse), [`kadai`](https://github.com/zdavison/kadai), [`deer`](https://github.com/zdavison/deer)
 
 
