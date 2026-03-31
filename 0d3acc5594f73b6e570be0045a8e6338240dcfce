@@ -1,0 +1,23 @@
+apps/cv/src/pages/vcard.astro
+  9de5d566bfba8e01 57-58,61,66,126
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "0d3acc5594f73b6e570be0045a8e6338240dcfce",
+  "prompts": {
+    "9de5d566bfba8e01": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "175ff557-ce0c-4393-bfb2-6f93cf493d00",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zachary Davison <zac.developer@gmail.com>",
+      "messages": [],
+      "total_additions": 5,
+      "total_deletions": 6,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    }
+  }
+}
