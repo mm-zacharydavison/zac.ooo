@@ -54,18 +54,16 @@ const contact = Object.values(
 <script>
   function fitName() {
     const el = document.querySelector('.vcard-name') as HTMLElement;
-    if (!el) return;
-    const container = el.closest('.vcard-left') as HTMLElement;
-    if (!container) return;
+    const container = el?.closest('.vcard-left') as HTMLElement;
+    if (!el || !container) return;
     el.style.fontSize = '';
-    const maxWidth = container.clientWidth;
     let size = parseFloat(window.getComputedStyle(el).fontSize);
-    while (el.scrollWidth > maxWidth && size > 8) {
+    while (el.scrollWidth > container.offsetWidth && size > 8) {
       size -= 0.5;
       el.style.fontSize = size + 'px';
     }
   }
-  fitName();
+  requestAnimationFrame(fitName);
   window.addEventListener('resize', fitName);
 </script>
 </BaseLayout>
@@ -125,6 +123,7 @@ const contact = Object.values(
     justify-content: space-between;
     flex: 1;
     min-width: 0;
+    overflow: hidden;
   }
 
   .vcard-contact {
