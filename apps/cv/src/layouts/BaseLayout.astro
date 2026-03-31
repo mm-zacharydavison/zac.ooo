@@ -1,5 +1,6 @@
 ---
 import "@fontsource-variable/dm-sans";
+import dmSansLatin from "@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2?url";
 
 import LinkTooltip from "../components/LinkTooltip.astro";
 
@@ -22,6 +23,7 @@ const {
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="generator" content={Astro.generator} />
         <meta name="description" content={description} />
+        <link rel="preload" href={dmSansLatin} as="font" type="font/woff2" crossorigin />
         <title>{title}</title>
         <script is:inline>
             document.documentElement.setAttribute("data-theme", "lofi");
