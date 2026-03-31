@@ -1,0 +1,23 @@
+apps/cv/src/components/LinkTooltip.astro
+  299f77373e2dd470 69,79-82,95-98,101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "01a6e3d8dc1973dd8a70790f978294fdf7c0b304",
+  "prompts": {
+    "299f77373e2dd470": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8aa1a6d8-d0e3-4ef1-9cf2-0df967c56735",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zachary Davison <zac.developer@gmail.com>",
+      "messages": [],
+      "total_additions": 40,
+      "total_deletions": 25,
+      "accepted_lines": 24,
+      "overriden_lines": 0
+    }
+  }
+}
