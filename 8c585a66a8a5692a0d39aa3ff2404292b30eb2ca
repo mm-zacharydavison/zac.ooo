@@ -1,0 +1,23 @@
+apps/cv/src/layouts/BaseLayout.astro
+  38d4d69a40ba02d9 3,26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.23",
+  "base_commit_sha": "8c585a66a8a5692a0d39aa3ff2404292b30eb2ca",
+  "prompts": {
+    "38d4d69a40ba02d9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fe437fd8-7a76-47b0-b817-4f727a278c26",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zachary Davison <zac.developer@gmail.com>",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 0,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
