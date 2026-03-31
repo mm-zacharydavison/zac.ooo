@@ -1,0 +1,66 @@
+---
+import { Icon } from "astro-icon/components";
+import BaseLayout from "./BaseLayout.astro";
+const { title, icon, printHidden = false } = Astro.props;
+---
+
+<BaseLayout>
+  <div class={`collapse collapse-arrow ease-in-out duration-700 ${printHidden ? 'print:hidden' : ''}`}>
+    <input aria-label={title} type="checkbox"/>
+    <div class="collapse-title font-extrabold tracking-tight md:text-2xl print:!pb-2">
+      <div class="flex">
+        <Icon name={icon} class="w-8 h-8 mr-4" />
+        {title}
+      </div>
+    </div>
+    <div class="collapse-content print:!block print:!h-auto print:!overflow-visible print:!max-h-none">
+      <slot/>
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Print styles to force all sections open */
+  @media print {
+    .collapse:not(.collapse-close) > input[type="checkbox"] {
+      display: block !important;
+      opacity: 0 !important;
+      position: absolute !important;
+      pointer-events: none !important;
+    }
+    
+    .collapse:not(.collapse-close) > input[type="checkbox"]:checked ~ .collapse-content,
+    .collapse:not(.collapse-close) > .collapse-content {
+      display: block !important;
+      height: auto !important;
+      overflow: visible !important;
+      max-height: none !important;
+      padding-top: 1rem !important;
+    }
+    
+    .collapse-title::after {
+      display: none !important;
+    }
+
+    /* Force checkbox to be checked state */
+    .collapse > input[type="checkbox"] {
+      opacity: 0;
+    }
+
+    .collapse > input[type="checkbox"] + .collapse-title + .collapse-content {
+      display: block !important;
+    }
+  }
+</style>
+
+<script>
+  // Force all accordion sections to be open when printing
+  if (typeof window !== 'undefined') {
+    window.addEventListener('beforeprint', () => {
+      const checkboxes = document.querySelectorAll('.collapse input[type="checkbox"]');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = true;
+      });
+    });
+  }
+</script>

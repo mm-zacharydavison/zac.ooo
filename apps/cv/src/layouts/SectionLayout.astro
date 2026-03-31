@@ -1,0 +1,68 @@
+---
+import { Icon } from "astro-icon/components";
+const { title, icon, printHidden = false, inline = false } = Astro.props;
+---
+
+<div class={`section-container mb-6 ${printHidden ? 'print:hidden' : ''} ${inline ? 'section-inline' : ''}`}>
+  <div class="section-title-wrapper">
+    <div class="section-title font-extrabold tracking-tight md:text-2xl">
+      <div class="flex items-center">
+        <Icon name={icon} class="w-8 h-8 mr-4" />
+        {title}
+      </div>
+    </div>
+  </div>
+  <div class="section-content">
+    <slot/>
+  </div>
+</div>
+
+<style>
+  .section-container {
+    margin-bottom: 1.5rem;
+  }
+  
+  .section-title-wrapper {
+    background: oklch(var(--b2, var(--b1)) / 1);
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+
+  .section-title {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0;
+  }
+  
+  .section-inline {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-inline .section-title-wrapper {
+    margin-left: 0;
+    margin-right: 0;
+    padding-left: 0;
+    padding-right: 0;
+    background: none;
+    margin-bottom: 0;
+  }
+
+  .section-inline .section-title {
+    padding: 0;
+    white-space: nowrap;
+  }
+
+  .section-inline .section-content {
+    flex: 1;
+  }
+
+  @media print {
+    .section-container {
+      page-break-inside: avoid;
+    }
+  }
+</style>

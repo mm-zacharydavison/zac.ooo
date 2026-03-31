@@ -1,0 +1,186 @@
+---
+import "@fontsource-variable/dm-sans";
+import { themeChange } from "theme-change";
+
+interface Props {
+    title?: string;
+    description?: string;
+}
+
+const {
+    title = "CV Template",
+    description = "A minimalist CV template built with Astro and Tailwind CSS",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="gl">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+        <meta name="description" content={description} />
+        <title>{title}</title>
+        <script is:inline>
+            if (localStorage.getItem("theme") === null) {
+                document.documentElement.setAttribute("data-theme", "lofi");
+            } else
+                document.documentElement.setAttribute(
+                    "data-theme",
+                    localStorage.getItem("theme"),
+                );
+        </script>
+        <script>
+            import { themeChange } from "theme-change";
+            themeChange();
+        </script>
+    </head>
+    <body class="min-h-screen">
+        <slot />
+    </body>
+</html>
+
+<style is:global>
+    body {
+        font-family: "DM Sans Variable", sans-serif;
+    }
+
+    @media (min-width: 768px) {
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+    }
+
+    @media only screen and (max-width: 480px) {
+        * {
+            font-size: 12px;
+        }
+    }
+
+    .overflow-y-scroll::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    .overflow-y-scroll::-webkit-scrollbar-thumb {
+        background-color: oklch(var(--s));
+    }
+
+    .overflow-y-scroll {
+        scrollbar-width: 1px;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            flex-direction: column;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+        }
+    }
+
+    /* Print styles */
+    @media print {
+        body {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            min-height: auto !important;
+        }
+
+        .print\:hidden {
+            display: none !important;
+        }
+
+        .card {
+            box-shadow: none !important;
+            page-break-inside: avoid;
+        }
+
+        .hatch-shadow::after {
+            display: none !important;
+        }
+
+        .section-container {
+            page-break-inside: avoid;
+        }
+    }
+
+    /* Custom prose styles to preserve multiple newlines and whitespace */
+    .prose p:empty {
+        height: 1em;
+        margin: 0.5em 0;
+        display: block;
+    }
+
+    .prose p + p {
+        margin-top: 1em;
+    }
+
+    /* Preserve spacing for consecutive empty paragraphs */
+    .prose p:empty + p:empty {
+        height: 1em;
+        margin-top: 0.5em;
+    }
+
+    /* Handle paragraphs containing only &nbsp; */
+    .prose p:has(br:only-child),
+    .prose p:has(span:only-child),
+    .prose p[data-empty="true"] {
+        height: 1em;
+        margin: 0.5em 0;
+        display: block;
+    }
+
+    /* Ensure non-breaking spaces render with proper spacing */
+    .prose p {
+        white-space: pre-wrap;
+        line-height: 1.6;
+        font-size: 0.85rem;
+    }
+
+    /* Apply font size to all prose elements */
+    .prose,
+    .prose p,
+    .prose li,
+    .prose ul,
+    .prose ol {
+        font-size: 0.85rem;
+    }
+
+    /* Comic book hatch shadow */
+    .hatch-shadow {
+        position: relative;
+    }
+
+    .hatch-shadow::after {
+        content: "";
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: repeating-linear-gradient(
+            45deg,
+            oklch(var(--s)) 0px,
+            oklch(var(--s)) 1px,
+            transparent 1px,
+            transparent 4px
+        );
+        border-radius: inherit;
+        pointer-events: none;
+        opacity: 0.3;
+        transition: top 0.15s ease, left 0.15s ease, opacity 0.15s ease;
+    }
+
+    .hatch-shadow:hover::after {
+        top: 6px;
+        left: 6px;
+    }
+
+</style>

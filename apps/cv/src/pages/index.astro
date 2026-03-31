@@ -1,0 +1,55 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Nav from "../components/Nav.astro";
+import ContactCard from "../components/ContactCard.astro";
+import { Icon } from "astro-icon/components";
+import * as about from "../content/about/about.md";
+
+const title = `${about.frontmatter.name} - ${about.frontmatter.designation}`;
+
+type MarkdownInstance = {
+  frontmatter: { title: string; url?: string; icon?: string };
+  compiledContent: () => string;
+};
+
+const contact = Object.values(
+  import.meta.glob("../content/contact/*.md", { eager: true })
+) as MarkdownInstance[];
+---
+
+<BaseLayout title={title}>
+  <Header />
+  <div
+    class="flex items-center absolute top-4 right-4 md:top-6 md:right-6 lg:top-8 lg:right-8 xl:top-10 xl:right-10 z-10 print:hidden"
+  >
+    <Icon name="carbon:moon" class="w-4 h-4" />
+    <input
+      type="checkbox"
+      data-toggle-theme="black,lofi"
+      data-act-class="ACTIVECLASS"
+      class="toggle toggle-sm mx-1 bg-secondary"
+      checked
+      aria-label="Toggle theme"
+    />
+    <Icon name="carbon:light" class="w-4 h-4" />
+  </div>
+
+  <Nav />
+
+  <main class="mx-auto flex-grow max-w-3xl py-6 w-[95vw]">
+    <article class="prose text-justify max-w-none text-base-content/60">
+      <Fragment set:html={about.compiledContent()} />
+    </article>
+
+    <div class="flex flex-wrap gap-4 justify-center mt-8">
+      {contact.map((item) => (
+        <ContactCard
+          url={item.frontmatter.url}
+          url_name={item.frontmatter.title}
+          icon={item.frontmatter.icon}
+        />
+      ))}
+    </div>
+  </main>
+</BaseLayout>

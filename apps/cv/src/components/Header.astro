@@ -1,0 +1,25 @@
+---
+import { Icon } from "astro-icon/components";
+import * as about from "../content/about/about.md";
+---
+
+<header class="mx-auto pt-6 pb-4 relative max-w-3xl w-[95vw]">
+  <article
+    class="flex flex-row items-end justify-between"
+  >
+    <h1 class="font-extrabold tracking-tight leading-none text-[2rem]">
+      {about.frontmatter.name}
+    </h1>
+
+    <div class="text-right flex flex-col gap-0.5">
+      <h2 class="text-xs text-secondary md:text-sm leading-none">
+        {about.frontmatter.designation}
+      </h2>
+      <div class="flex items-center justify-end">
+        <Icon name="carbon:location" class="w-3 h-3 mr-0.5" />
+        <p class="text-xs text-secondary leading-none">{about.frontmatter.location}</p>
+      </div>
+    </div>
+  </article>
+</header>
+

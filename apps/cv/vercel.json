@@ -1,0 +1,11 @@
+{
+  "framework": "astro",
+  "buildCommand": "bun run build",
+  "installCommand": "bun install",
+  "build": {
+    "env": {
+      "APP_NAME": "cv"
+    }
+  },
+  "ignoreCommand": "node ../../ignore-vercel-build.js"
+}

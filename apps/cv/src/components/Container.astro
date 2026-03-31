@@ -1,0 +1,133 @@
+---
+import { Icon } from "astro-icon/components";
+import SectionLayout from "../layouts/SectionLayout.astro";
+import * as about from "../content/about/about.md";
+import Card from "./Card.astro";
+import ContactCard from "./ContactCard.astro";
+
+type MarkdownInstance = {
+  frontmatter: {
+    title: string;
+    date?: string;
+    tags?: string[];
+    url?: string;
+    org?: string;
+    location?: string;
+    institute?: string;
+    url_name?: string;
+    icon?: string;
+    cv?: boolean;
+  };
+  compiledContent: () => string;
+};
+
+const works = Object.values(import.meta.glob("../content/works/*.md", { eager: true })) as MarkdownInstance[];
+const projectModules = import.meta.glob("../content/projects/*.md", { eager: true }) as Record<string, MarkdownInstance>;
+const projectOrderFile = await import("../content/projects/index.txt?raw");
+const projectOrder = projectOrderFile.default.split("\n").map((s: string) => s.trim()).filter(Boolean);
+const projects = projectOrder
+  .map((name: string) => {
+    const key = Object.keys(projectModules).find((k) => k.endsWith(`/${name}.md`));
+    return key ? projectModules[key] : null;
+  })
+  .filter(Boolean) as MarkdownInstance[];
+const cvProjects = projects.filter((p) => p.frontmatter.cv);
+const education = Object.values(import.meta.glob("../content/education/*.md", { eager: true })) as MarkdownInstance[];
+const certificates = Object.values(import.meta.glob("../content/certificates/*.md", { eager: true })) as MarkdownInstance[];
+const blogs = Object.values(import.meta.glob("../content/blogs/*.md", { eager: true })) as MarkdownInstance[];
+const contact = Object.values(import.meta.glob("../content/contact/*.md", { eager: true })) as MarkdownInstance[];
+const PDF = "/cv-20240219.pdf";
+---
+
+<div class="sections-container space-y-6">
+  <SectionLayout title={"About"} icon={"carbon:identification"}>
+    <div class="flex flex-wrap gap-2 justify-center">
+      {
+        contact.map((item) => {
+          return (
+            <ContactCard
+              label={item.frontmatter.label}
+              icon={item.frontmatter.icon}
+            />
+          );
+        })
+      }
+    </div>
+    <div class="divider my-2"></div>
+    <article class="prose text-justify max-w-none text-base-content/60">
+      <Fragment set:html={about.compiledContent()} />
+    </article>
+  </SectionLayout>
+
+  <SectionLayout title={"Work"} icon={"carbon:construction"}>
+    {
+      works.map((item) => {
+        return (
+          <Card
+            title={item.frontmatter.title}
+            timeframe={item.frontmatter.date}
+            description={item.compiledContent()}
+            tags={item.frontmatter.tags}
+            url={item.frontmatter.url}
+            org={item.frontmatter.org}
+            location={item.frontmatter.location}
+          />
+        );
+      })
+    }
+  </SectionLayout>
+
+  <SectionLayout title={"Education"} icon={"carbon:education"}>
+    {
+      education.map((item) => {
+        return (
+          <Card
+            title={item.frontmatter.title}
+            timeframe={item.frontmatter.date}
+            location={item.frontmatter.location}
+            tags={item.frontmatter.tags}
+            url={item.frontmatter.url}
+            url_name={item.frontmatter.institute}
+          />
+        );
+      })
+    }
+  </SectionLayout>
+
+  <SectionLayout title={"Projects"} icon={"carbon:code"}>
+    {
+      cvProjects.map((item) => {
+        const url = item.frontmatter.url;
+        return (
+          <div
+            data-href={url || undefined}
+            class:list={[
+              "card card-compact card-bordered border border-[oklch(var(--s)/0.3)] hover:border-[oklch(var(--s))] transition-all hatch-shadow bg-base-100 my-4",
+              url && "cursor-pointer project-card",
+            ]}
+          >
+            <div class="card-body">
+              <h2 class="card-title font-bold tracking-tight text-base-content/70 font-mono lowercase">
+                {item.frontmatter.title}
+              </h2>
+              <div class="prose text-base-content/50">
+                <Fragment set:html={item.compiledContent()} />
+              </div>
+            </div>
+          </div>
+        );
+      })
+    }
+  </SectionLayout>
+
+</div>
+
+<script>
+  document.querySelectorAll(".project-card").forEach((card) => {
+    card.addEventListener("click", (e) => {
+      if ((e.target as HTMLElement).closest("a")) return;
+      const href = (card as HTMLElement).dataset.href;
+      if (href) window.open(href, "_blank");
+    });
+  });
+</script>

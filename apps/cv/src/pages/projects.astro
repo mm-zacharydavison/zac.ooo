@@ -1,0 +1,86 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Nav from "../components/Nav.astro";
+import { Icon } from "astro-icon/components";
+import * as about from "../content/about/about.md";
+
+const title = `${about.frontmatter.name} - Projects`;
+
+type MarkdownInstance = {
+  frontmatter: {
+    title: string;
+    date?: string;
+    tags?: string[];
+    url?: string;
+  };
+  compiledContent: () => string;
+};
+
+const projectModules = import.meta.glob("../content/projects/*.md", { eager: true }) as Record<string, MarkdownInstance>;
+const orderFile = await import("../content/projects/index.txt?raw");
+const order = orderFile.default.split("\n").map((s: string) => s.trim()).filter(Boolean);
+
+const projects = order
+  .map((name: string) => {
+    const key = Object.keys(projectModules).find((k) => k.endsWith(`/${name}.md`));
+    return key ? projectModules[key] : null;
+  })
+  .filter(Boolean) as MarkdownInstance[];
+---
+
+<BaseLayout title={title}>
+  <Header />
+  <div
+    class="flex items-center absolute top-4 right-4 md:top-6 md:right-6 lg:top-8 lg:right-8 xl:top-10 xl:right-10 z-10 print:hidden"
+  >
+    <Icon name="carbon:moon" class="w-4 h-4" />
+    <input
+      type="checkbox"
+      data-toggle-theme="black,lofi"
+      data-act-class="ACTIVECLASS"
+      class="toggle toggle-sm mx-1 bg-secondary"
+      checked
+      aria-label="Toggle theme"
+    />
+    <Icon name="carbon:light" class="w-4 h-4" />
+  </div>
+
+  <Nav />
+
+  <main class="mx-auto flex-grow max-w-3xl py-6 w-[95vw]">
+    <div class="space-y-4">
+      {projects.map((item) => {
+        const url = item.frontmatter.url;
+        return (
+          <div
+            data-href={url || undefined}
+            class:list={[
+              "card card-compact card-bordered border border-[oklch(var(--s)/0.3)] hover:border-[oklch(var(--s))] transition-all hatch-shadow bg-base-100",
+              url && "cursor-pointer project-card",
+            ]}
+          >
+            <div class="card-body">
+              <h2 class="card-title font-bold tracking-tight text-base-content/70 font-mono lowercase">
+                {item.frontmatter.title}
+              </h2>
+              <div class="prose text-base-content/50">
+                <Fragment set:html={item.compiledContent()} />
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  document.querySelectorAll(".project-card").forEach((card) => {
+    card.addEventListener("click", (e) => {
+      if ((e.target as HTMLElement).closest("a")) return;
+      const href = (card as HTMLElement).dataset.href;
+      if (href) window.open(href, "_blank");
+    });
+  });
+</script>

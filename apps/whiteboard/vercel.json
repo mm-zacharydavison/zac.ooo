@@ -1,7 +1,7 @@
 {
 	"build": {
 		"env": {
-			"APP_NAME": "zac-ooo"
+			"APP_NAME": "whiteboard"
 		}
 	},
 	"ignoreCommand": "node ../../ignore-vercel-build.js"

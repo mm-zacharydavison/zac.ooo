@@ -1,0 +1,93 @@
+---
+import { Icon } from "astro-icon/components";
+const { timeframe, title, description, url, tags, url_name, location, org } =
+  Astro.props;
+
+// Function to calculate years from date range
+function calculateDuration(timeframe: any): string {
+  if (!timeframe || typeof timeframe !== 'string') return "";
+  
+  // Parse format like "03.2016 - 04.2020" or "06.2021 - Present"
+  const match = timeframe.match(/(\d{2})\.(\d{4})\s*-\s*(.+)/);
+  if (!match) return "";
+  
+  const [, startMonth, startYear, endPart] = match;
+  const startDate = new Date(parseInt(startYear), parseInt(startMonth) - 1);
+  
+  let endDate: Date;
+  if (endPart.trim().toLowerCase() === 'present') {
+    endDate = new Date();
+  } else {
+    const endMatch = endPart.match(/(\d{2})\.(\d{4})/);
+    if (!endMatch) return "";
+    const [, endMonth, endYear] = endMatch;
+    endDate = new Date(parseInt(endYear), parseInt(endMonth) - 1);
+  }
+  
+  const diffInMonths = (endDate.getFullYear() - startDate.getFullYear()) * 12 + 
+                      (endDate.getMonth() - startDate.getMonth());
+  
+  const years = Math.floor(diffInMonths / 12);
+  const months = diffInMonths % 12;
+  
+  if (years === 0) {
+    return months === 1 ? "1 month" : `${months} months`;
+  } else if (months === 0) {
+    return years === 1 ? "1 year" : `${years} years`;
+  } else {
+    const yearText = years === 1 ? "1 year" : `${years} years`;
+    const monthText = months === 1 ? "1 month" : `${months} months`;
+    return `${yearText}, ${monthText}`;
+  }
+}
+
+const duration = calculateDuration(timeframe);
+---
+
+<div class="card card-compact card-bordered border border-[oklch(var(--s)/0.3)] hover:border-[oklch(var(--s))] w-full md:w-112 lg:w-128 transition-all my-4 hatch-shadow bg-base-100">
+  <div class="card-body">
+    <div class="grid grid-cols-3 gap-4 mb-2">
+      <div class="self-start col-span-2 justify-self-start text-left">
+        <h1 class="uppercase card-title font-extrabold tracking-tighter md:text-2xl text-base-content/70">{title}</h1>
+        {(org || location) && (
+          <div class="flex items-center mt-2">
+            <Icon name="carbon:location" class="w-4 h-4 mr-1" />
+            <p class="text-sm font-light text-secondary">
+              {org && url ? <a href={url} target="_blank" class="link link-hover">{org}</a> : org}
+              {org && location && " — "}
+              {location}
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div class="self-center justify-self-end text-right">
+        {timeframe && (
+          <div>
+            <div class="badge w-max h-max text-center badge-outline inline-block align-middle shadow-[1px_1px_0px_oklch(var(--s))] font-mono">
+              {timeframe}
+            </div>
+            {duration && (
+              <div class="text-xs text-secondary mt-1 font-light">
+                {duration}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+
+    <div>
+      <article class="prose text-base-content/50 max-w-none">
+        <Fragment set:html={description}></Fragment>
+      </article>
+      {Array.isArray(tags) && (
+        <div class="flex flex-wrap content-around gap-2 my-4">
+          {tags.map((item) => (
+            <span class="badge text-center inline-block align-middle w-max h-max text-sm  badge-outline shadow-[1px_1px_0px_oklch(var(--s))] mb-1" :key={item}>{item}</span>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+</div>

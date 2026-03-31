@@ -1,0 +1,62 @@
+---
+const currentPath = Astro.url.pathname;
+
+const links = [
+  { href: "/", label: "About" },
+  { href: "/projects", label: "Projects" },
+  { href: "/blog", label: "Blog" },
+  { href: "/cv", label: "CV" },
+];
+---
+
+<nav class="mx-auto max-w-3xl w-[95vw] print:hidden">
+  <div class="nav-separator"></div>
+  <div class="flex gap-1 justify-center">
+    {links.map((link) => {
+      const isActive = link.href === "/"
+        ? currentPath === "/"
+        : currentPath.startsWith(link.href);
+      return (
+        <a
+          href={link.href}
+          class:list={[
+            "nav-link px-4 py-2 text-sm font-medium transition-colors relative",
+            isActive
+              ? "nav-active font-bold"
+              : "text-secondary hover:text-current",
+          ]}
+        >
+          {link.label}
+        </a>
+      );
+    })}
+  </div>
+  <div class="nav-separator"></div>
+</nav>
+
+<style>
+  .nav-link {
+    position: relative;
+  }
+
+  .nav-separator {
+    height: 1px;
+    background: oklch(var(--s) / 0.4);
+  }
+
+  .nav-active::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: repeating-linear-gradient(
+      45deg,
+      oklch(var(--s)) 0px,
+      oklch(var(--s)) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  }
+</style>

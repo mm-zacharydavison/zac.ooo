@@ -29,3 +29,12 @@ playwright-report
 
 # .env
 .env
+
+# Turbo
+.turbo
+
+# Wrangler
+.wrangler
+
+# MCP config
+.mcp.json
