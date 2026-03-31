@@ -22,7 +22,7 @@ const contact = Object.values(
       <div class="vcard-inner">
         <div class="vcard-left">
           <div class="vcard-main">
-            <h1 class="font-extrabold tracking-tight leading-none text-[1.4rem] md:text-[1.8rem]">
+            <h1 class="vcard-name font-extrabold tracking-tight leading-none text-[1.4rem] md:text-[1.8rem]">
               {about.frontmatter.name}
             </h1>
             <h2 class="text-xs md:text-sm text-secondary mt-1">
@@ -51,6 +51,25 @@ const contact = Object.values(
       </div>
     </div>
   </div>
+<script>
+  function fitName() {
+    const el = document.querySelector('.vcard-name') as HTMLElement;
+    if (!el) return;
+    const parent = el.parentElement!;
+    const style = window.getComputedStyle(el);
+    let size = parseFloat(style.fontSize);
+    while (el.scrollWidth > parent.clientWidth && size > 8) {
+      size -= 0.5;
+      el.style.fontSize = size + 'px';
+    }
+  }
+  fitName();
+  window.addEventListener('resize', () => {
+    const el = document.querySelector('.vcard-name') as HTMLElement;
+    if (el) el.style.fontSize = '';
+    fitName();
+  });
+</script>
 </BaseLayout>
 
 <style>
@@ -83,6 +102,12 @@ const contact = Object.values(
   .vcard-main {
     display: flex;
     flex-direction: column;
+  }
+
+  .vcard-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .vcard-divider {
