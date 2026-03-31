@@ -1,0 +1,179 @@
+---
+---
+
+<script>
+  const previewCache = new Map<string, { title?: string; description?: string; image?: string }>();
+
+  function initTooltips() {
+    const tooltip = document.createElement("div");
+    tooltip.className = "link-tooltip";
+    document.body.appendChild(tooltip);
+
+    let activeLink: HTMLElement | null = null;
+
+    function renderTooltipContent(raw: string): { html: string; previewUrls: string[] } {
+      const previewUrls: string[] = [];
+
+      // Replace link previews @[label](url) with placeholder cards
+      let html = raw.replace(
+        /@\[([^\]]*)\]\(([^)]+)\)/g,
+        (_match, _label, url) => {
+          previewUrls.push(url);
+          return `<div class="link-preview" data-preview-url="${url}"><div class="link-preview-loading">Loading preview\u2026</div></div>`;
+        }
+      );
+
+      // Replace markdown images ![alt](src) with <img> tags
+      html = html.replace(
+        /!\[([^\]]*)\]\(([^)]+)\)/g,
+        '<img src="$2" alt="$1" class="link-tooltip-img" />'
+      );
+
+      const hasRichContent = html !== raw;
+      return { html: hasRichContent ? html : "", previewUrls };
+    }
+
+    function renderPreviewCard(data: { title?: string; description?: string; image?: string }, url: string): string {
+      const parts: string[] = [];
+      if (data.image) {
+        parts.push(`<img src="${data.image}" alt="" class="link-preview-img" />`);
+      }
+      parts.push('<div class="link-preview-text">');
+      if (data.title) {
+        parts.push(`<div class="link-preview-title">${data.title}</div>`);
+      }
+      if (data.description) {
+        const truncated = data.description.length > 120
+          ? data.description.slice(0, 120) + "\u2026"
+          : data.description;
+        parts.push(`<div class="link-preview-desc">${truncated}</div>`);
+      }
+      const domain = new URL(url).hostname;
+      parts.push(`<div class="link-preview-domain">${domain}</div>`);
+      parts.push('</div>');
+      return parts.join("");
+    }
+
+    async function fetchPreview(url: string): Promise<{ title?: string; description?: string; image?: string }> {
+      const cached = previewCache.get(url);
+      if (cached) return cached;
+
+      const res = await fetch(`/api/preview?url=${encodeURIComponent(url)}`);
+      const data = await res.json();
+      previewCache.set(url, data);
+      return data;
+    }
+
+    function position(link: HTMLElement) {
+      const rect = link.getBoundingClientRect();
+      const tooltipRect = tooltip.getBoundingClientRect();
+
+      // Find the left edge of the content column
+      const content = document.querySelector("main") ?? document.querySelector(".sections-container");
+      const contentLeft = content ? content.getBoundingClientRect().left : rect.left;
+
+      const marginWidth = contentLeft - 16;
+      const hasMarginSpace = marginWidth >= 160;
+
+      if (hasMarginSpace) {
+        // Position in left margin, vertically centered on the element
+        const left = contentLeft - tooltipRect.width - 16;
+        const linkCenterY = rect.top + rect.height / 2;
+        let top = linkCenterY + window.scrollY - tooltipRect.height / 2;
+        top = Math.max(8 + window.scrollY, top);
+
+        const arrowTop = rect.top + rect.height / 2 + window.scrollY - top;
+        tooltip.style.setProperty("--arrow-top", `${arrowTop}px`);
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${top}px`;
+        tooltip.classList.add("tooltip-left");
+        tooltip.classList.remove("tooltip-above");
+      } else {
+        // Fallback: position above the element
+        const linkCenter = rect.left + rect.width / 2;
+        let left = linkCenter - tooltipRect.width / 2;
+        left = Math.max(8, Math.min(left, window.innerWidth - tooltipRect.width - 8));
+
+        const arrowLeft = linkCenter - left;
+        tooltip.style.setProperty("--arrow-left", `${arrowLeft}px`);
+        tooltip.style.left = `${left}px`;
+        tooltip.style.top = `${rect.top + window.scrollY - tooltipRect.height - 8}px`;
+        tooltip.classList.add("tooltip-above");
+        tooltip.classList.remove("tooltip-left");
+      }
+    }
+
+    function show(link: HTMLElement) {
+      const raw = link.getAttribute("data-tooltip");
+      if (!raw) return;
+
+      activeLink = link;
+      link.classList.add("tooltip-active");
+
+      const { html, previewUrls } = renderTooltipContent(raw);
+      if (html) {
+        tooltip.innerHTML = html;
+
+        // Reposition after images load
+        tooltip.querySelectorAll("img").forEach((img) => {
+          img.addEventListener("load", () => {
+            if (activeLink === link) position(link);
+          }, { once: true });
+        });
+
+        // Fetch link previews
+        for (const url of previewUrls) {
+          fetchPreview(url).then((data) => {
+            if (activeLink !== link) return;
+            const el = tooltip.querySelector(`[data-preview-url="${url}"]`);
+            if (!el) return;
+            el.innerHTML = renderPreviewCard(data, url);
+            // Reposition after preview image loads
+            const img = el.querySelector("img");
+            if (img) {
+              img.addEventListener("load", () => {
+                if (activeLink === link) position(link);
+              }, { once: true });
+            }
+            position(link);
+          });
+        }
+      } else {
+        tooltip.textContent = raw;
+      }
+
+      tooltip.classList.add("visible");
+      position(link);
+    }
+
+    function hide() {
+      if (activeLink) activeLink.classList.remove("tooltip-active");
+      activeLink = null;
+      tooltip.classList.remove("visible");
+    }
+
+    // Move native title attrs to data-tooltip to prevent browser default
+    document.querySelectorAll(".prose a[title]").forEach((link) => {
+      const a = link as HTMLAnchorElement;
+      a.setAttribute("data-tooltip", a.title);
+      a.removeAttribute("title");
+    });
+
+    document.addEventListener("mouseover", (e) => {
+      const el = (e.target as Element).closest?.("[data-tooltip]") as HTMLElement | null;
+      if (el) show(el);
+    });
+
+    document.addEventListener("mouseout", (e) => {
+      const el = (e.target as Element).closest?.("[data-tooltip]") as HTMLElement | null;
+      if (el && el === activeLink) hide();
+    });
+  }
+
+  document.addEventListener("astro:page-load", initTooltips);
+  if (document.readyState !== "loading") {
+    initTooltips();
+  } else {
+    document.addEventListener("DOMContentLoaded", initTooltips);
+  }
+</script>

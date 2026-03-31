@@ -1,8 +1,8 @@
 ---
-const { icon, label } = Astro.props;
+const { icon, label, url } = Astro.props;
 import { Icon } from "astro-icon/components";
 ---
 
-<span class="inline-flex items-center gap-1 text-sm">
+<a href={url} class="inline-flex items-center gap-1 text-sm hover:underline" target="_blank" rel="noopener noreferrer">
   <Icon name={icon} class="w-3.5 h-3.5" />{label}
-</span>
+</a>

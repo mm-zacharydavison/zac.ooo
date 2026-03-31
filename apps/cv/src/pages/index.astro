@@ -9,7 +9,7 @@ import * as about from "../content/about/about.md";
 const title = `${about.frontmatter.name} - ${about.frontmatter.designation}`;
 
 type MarkdownInstance = {
-  frontmatter: { title: string; url?: string; icon?: string };
+  frontmatter: { title: string; url?: string; icon?: string; label?: string };
   compiledContent: () => string;
 };
 
@@ -21,7 +21,7 @@ const contact = Object.values(
 <BaseLayout title={title}>
   <Header />
   <div
-    class="flex items-center absolute top-4 right-4 md:top-6 md:right-6 lg:top-8 lg:right-8 xl:top-10 xl:right-10 z-10 print:hidden"
+    class="flex items-center absolute top-14 right-4 md:top-6 md:right-6 lg:top-8 lg:right-8 xl:top-10 xl:right-10 z-10 print:hidden"
   >
     <Icon name="carbon:moon" class="w-4 h-4" />
     <input
@@ -46,7 +46,7 @@ const contact = Object.values(
       {contact.map((item) => (
         <ContactCard
           url={item.frontmatter.url}
-          url_name={item.frontmatter.title}
+          label={item.frontmatter.label}
           icon={item.frontmatter.icon}
         />
       ))}

@@ -49,11 +49,19 @@ const duration = calculateDuration(timeframe);
     <div class="grid grid-cols-3 gap-4 mb-2">
       <div class="self-start col-span-2 justify-self-start text-left">
         <h1 class="uppercase card-title font-extrabold tracking-tighter md:text-2xl text-base-content/70">{title}</h1>
+        {url_name && (
+          <div class="flex items-center mt-2">
+            <Icon name="carbon:education" class="w-4 h-4 mr-1" />
+            <p class="text-sm font-light text-secondary">
+              {url ? <a href={url} target="_blank" class="link link-hover" data-tooltip={`@[${url_name}](${url})`}>{url_name}</a> : url_name}
+            </p>
+          </div>
+        )}
         {(org || location) && (
           <div class="flex items-center mt-2">
             <Icon name="carbon:location" class="w-4 h-4 mr-1" />
             <p class="text-sm font-light text-secondary">
-              {org && url ? <a href={url} target="_blank" class="link link-hover">{org}</a> : org}
+              {org && url ? <a href={url} target="_blank" class="link link-hover" data-tooltip={`@[${org}](${url})`}>{org}</a> : org}
               {org && location && " — "}
               {location}
             </p>
@@ -83,9 +91,18 @@ const duration = calculateDuration(timeframe);
       </article>
       {Array.isArray(tags) && (
         <div class="flex flex-wrap content-around gap-2 my-4">
-          {tags.map((item) => (
-            <span class="badge text-center inline-block align-middle w-max h-max text-sm  badge-outline shadow-[1px_1px_0px_oklch(var(--s))] mb-1" :key={item}>{item}</span>
-          ))}
+          {tags.map((item) => {
+            const name = typeof item === "string" ? item : item.name;
+            const tip = typeof item === "string" ? undefined : item.tooltip;
+            return (
+              <span
+                class="badge text-center inline-block align-middle w-max h-max text-sm badge-outline shadow-[1px_1px_0px_oklch(var(--s))] mb-1"
+                data-tooltip={tip}
+              >
+                {name}
+              </span>
+            );
+          })}
         </div>
       )}
     </div>

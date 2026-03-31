@@ -6,4 +6,4 @@ tags: ["Python", "Animation", "Generative"]
 date: 2026
 ---
 
-Generate [zoetrope](https://en.wikipedia.org/wiki/Zoetrope) animations for vinyl record center stickers from any video.
+Generate [zoetrope](https://en.wikipedia.org/wiki/Zoetrope "@[Zoetrope](https://en.wikipedia.org/wiki/Zoetrope)") animations for vinyl record center stickers from any video.

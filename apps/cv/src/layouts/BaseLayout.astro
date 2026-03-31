@@ -1,6 +1,7 @@
 ---
 import "@fontsource-variable/dm-sans";
 import { themeChange } from "theme-change";
+import LinkTooltip from "../components/LinkTooltip.astro";
 
 interface Props {
     title?: string;
@@ -38,6 +39,7 @@ const {
     </head>
     <body class="min-h-screen">
         <slot />
+        <LinkTooltip />
     </body>
 </html>
 
@@ -181,6 +183,119 @@ const {
     .hatch-shadow:hover::after {
         top: 6px;
         left: 6px;
+    }
+
+    /* Link tooltip */
+    .link-tooltip {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 0.35rem 0.6rem;
+        font-size: 0.75rem;
+        line-height: 1.4;
+        max-width: 260px;
+        background: oklch(var(--b1));
+        color: oklch(var(--bc));
+        border: 1px solid oklch(var(--bc) / 0.15);
+        border-radius: 0.25rem;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        z-index: 50;
+        box-shadow: 0 2px 8px oklch(var(--bc) / 0.08);
+    }
+
+    .link-tooltip::after {
+        content: "";
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: oklch(var(--b1));
+        rotate: 45deg;
+    }
+
+    /* Arrow pointing down (tooltip above element) */
+    .link-tooltip.tooltip-above::after {
+        bottom: -6px;
+        left: var(--arrow-left, 50%);
+        transform: translateX(-50%);
+        border-right: 1px solid oklch(var(--bc) / 0.15);
+        border-bottom: 1px solid oklch(var(--bc) / 0.15);
+    }
+
+    /* Arrow pointing right (tooltip in left margin) */
+    .link-tooltip.tooltip-left::after {
+        right: -6px;
+        top: var(--arrow-top, 50%);
+        transform: translateY(-50%);
+        border-top: 1px solid oklch(var(--bc) / 0.15);
+        border-right: 1px solid oklch(var(--bc) / 0.15);
+    }
+
+    .link-tooltip.visible {
+        opacity: 1;
+    }
+
+    /* Highlight the hovered tooltip source */
+    .tooltip-active {
+        background: oklch(var(--s) / 0.15);
+        border-radius: 0.15rem;
+    }
+
+    .link-tooltip-img {
+        display: block;
+        max-width: 240px;
+        max-height: 160px;
+        border-radius: 0.2rem;
+        margin: 0.25rem 0;
+    }
+
+    .link-tooltip:has(.link-preview) {
+        max-width: 320px;
+    }
+
+    .link-preview {
+        min-width: 200px;
+    }
+
+    .link-preview-loading {
+        color: oklch(var(--bc) / 0.4);
+        font-style: italic;
+        padding: 0.25rem 0;
+    }
+
+    .link-preview-img {
+        display: block;
+        width: 100%;
+        max-height: 120px;
+        object-fit: cover;
+        border-radius: 0.2rem;
+        margin-bottom: 0.35rem;
+    }
+
+    .link-preview-text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+    }
+
+    .link-preview-title {
+        font-weight: 600;
+        font-size: 0.75rem;
+        line-height: 1.3;
+        color: oklch(var(--bc));
+    }
+
+    .link-preview-desc {
+        font-size: 0.7rem;
+        line-height: 1.4;
+        color: oklch(var(--bc) / 0.6);
+    }
+
+    .link-preview-domain {
+        font-size: 0.65rem;
+        color: oklch(var(--bc) / 0.35);
+        margin-top: 0.1rem;
     }
 
 </style>

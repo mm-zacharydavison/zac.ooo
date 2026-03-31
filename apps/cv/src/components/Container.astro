@@ -46,6 +46,7 @@ const PDF = "/cv-20240219.pdf";
         contact.map((item) => {
           return (
             <ContactCard
+              url={item.frontmatter.url}
               label={item.frontmatter.label}
               icon={item.frontmatter.icon}
             />
