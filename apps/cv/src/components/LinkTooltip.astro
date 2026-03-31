@@ -66,7 +66,7 @@
 
     function position(link: HTMLElement) {
       const rect = link.getBoundingClientRect();
-      const tooltipRect = tooltip.getBoundingClientRect();
+      const pad = 8;
 
       // Find the left edge of the content column
       const content = document.querySelector("main") ?? document.querySelector(".sections-container");
@@ -76,7 +76,10 @@
       const hasMarginSpace = marginWidth >= 160;
 
       if (hasMarginSpace) {
-        // Position in left margin, vertically centered on the element
+        // Constrain width to available margin space
+        tooltip.style.maxWidth = `${marginWidth - pad}px`;
+
+        const tooltipRect = tooltip.getBoundingClientRect();
         const left = contentLeft - tooltipRect.width - 16;
         const linkCenterY = rect.top + rect.height / 2;
         let top = linkCenterY + window.scrollY - tooltipRect.height / 2;
@@ -89,10 +92,13 @@
         tooltip.classList.add("tooltip-left");
         tooltip.classList.remove("tooltip-above");
       } else {
-        // Fallback: position above the element
+        // Constrain width to viewport
+        tooltip.style.maxWidth = `${window.innerWidth - pad * 2}px`;
+
+        const tooltipRect = tooltip.getBoundingClientRect();
         const linkCenter = rect.left + rect.width / 2;
         let left = linkCenter - tooltipRect.width / 2;
-        left = Math.max(8, Math.min(left, window.innerWidth - tooltipRect.width - 8));
+        left = Math.max(pad, Math.min(left, window.innerWidth - tooltipRect.width - pad));
 
         const arrowLeft = linkCenter - left;
         tooltip.style.setProperty("--arrow-left", `${arrowLeft}px`);
