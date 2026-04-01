@@ -1,0 +1,23 @@
+apps/cv/src/pages/vcard.astro
+  461c225389550556 8,21,23-24,26,29,32-35,38-40,44-46,50,58,79,85-87,90-95,106,108-116,119-120,125-134,139-140,143,145,152,155-167,172-173,175,183,200-201,204-205,208-209,212-214,217-218,222-224,232,236,242
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.2.3",
+  "base_commit_sha": "eb1c4190baedfaf602f9d28637e9c95cedd4a48f",
+  "prompts": {
+    "461c225389550556": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "96a479f4-2513-4cea-ac69-c8b3f150e731",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Zachary Davison",
+      "messages": [],
+      "total_additions": 99,
+      "total_deletions": 69,
+      "accepted_lines": 93,
+      "overriden_lines": 0
+    }
+  }
+}
