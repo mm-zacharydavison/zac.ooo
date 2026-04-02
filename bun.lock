@@ -17,7 +17,7 @@
         "astro": "^6.1.2",
         "astro-compress": "^2.2.21",
         "astro-icon": "^1.1.0",
-        "card.ooo": "0.0.2",
+        "card.ooo": "^0.0.4",
         "framer-motion": "^11.18.2",
         "qrcode": "^1.5.4",
         "tailwindcss": "^3.4.17",
@@ -557,7 +557,7 @@
 
     "caniuse-lite": ["caniuse-lite@1.0.30001782", "", {}, "sha512-dZcaJLJeDMh4rELYFw1tvSn1bhZWYFOt468FcbHHxx/Z/dFidd1I6ciyFdi3iwfQCyOjqo9upF6lGQYtMiJWxw=="],
 
-    "card.ooo": ["card.ooo@0.0.2", "", { "dependencies": { "qrcode": "^1.5.4" } }, "sha512-XCbpo/GDsXr+GgE0Gm8pW9GGwd2CvcKVxiU0I1xbaykluW6RKKVOXli3LyXjdW446uNz4d7IHya2DoKumNUKbQ=="],
+    "card.ooo": ["card.ooo@0.0.4", "", { "dependencies": { "qrcode": "^1.5.4" } }, "sha512-a7okj5NjGm+fFkRToTv0Pvhmcs8B6l7mKXm1TgWZAmdSqFR85vnm/3fkVM1CBdG8XlV036YzCurhLQq8c998Bw=="],
 
     "caseless": ["caseless@0.12.0", "", {}, "sha512-4tYFyifaFfGacoiObjJegolkwSU4xQNGbVgUiNYVUxbQ2x2lUsFvY4hVgVzGiIe6WLOPqycWXA40l+PWsxthUw=="],
 
