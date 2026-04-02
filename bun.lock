@@ -17,6 +17,7 @@
         "astro": "^6.1.2",
         "astro-compress": "^2.2.21",
         "astro-icon": "^1.1.0",
+        "card.ooo": "0.0.2",
         "framer-motion": "^11.18.2",
         "qrcode": "^1.5.4",
         "tailwindcss": "^3.4.17",
@@ -555,6 +556,8 @@
     "camelcase-css": ["camelcase-css@2.0.1", "", {}, "sha512-QOSvevhslijgYwRx6Rv7zKdMF8lbRmx+uQGx2+vDc+KI/eBnsy9kit5aj23AgGu3pa4t9AgwbnXWqS+iOY+2aA=="],
 
     "caniuse-lite": ["caniuse-lite@1.0.30001782", "", {}, "sha512-dZcaJLJeDMh4rELYFw1tvSn1bhZWYFOt468FcbHHxx/Z/dFidd1I6ciyFdi3iwfQCyOjqo9upF6lGQYtMiJWxw=="],
+
+    "card.ooo": ["card.ooo@0.0.2", "", { "dependencies": { "qrcode": "^1.5.4" } }, "sha512-XCbpo/GDsXr+GgE0Gm8pW9GGwd2CvcKVxiU0I1xbaykluW6RKKVOXli3LyXjdW446uNz4d7IHya2DoKumNUKbQ=="],
 
     "caseless": ["caseless@0.12.0", "", {}, "sha512-4tYFyifaFfGacoiObjJegolkwSU4xQNGbVgUiNYVUxbQ2x2lUsFvY4hVgVzGiIe6WLOPqycWXA40l+PWsxthUw=="],
 
