@@ -7,9 +7,12 @@ export const GET: APIRoute = async () => {
     jobTitle: "Engineering Manager",
     org: "zac.ooo",
     email: "thingsdoer@gmail.com",
-    phone: "",
+    phone: "+353 83 484 0209",
     url: "https://zac.ooo",
     logo: "/favicon.svg",
+    theme: {
+      logoFilter: "invert(1)",
+    },
   });
 
   return new Response(html, {
