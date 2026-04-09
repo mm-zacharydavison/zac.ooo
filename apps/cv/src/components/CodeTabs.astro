@@ -1,0 +1,51 @@
+---
+import { Code } from "astro:components";
+
+type Tab = {
+  label: string;
+  lang: string;
+  code: string;
+};
+
+interface Props {
+  tabs: Tab[];
+}
+
+const { tabs } = Astro.props;
+const id = `codetabs-${Math.random().toString(36).slice(2, 8)}`;
+---
+
+<div class="codetabs not-prose border border-base-300 rounded-box overflow-hidden">
+  <div role="tablist" class="tabs tabs-bordered bg-base-200 border-b border-base-300">
+    {tabs.map((tab, i) => (
+      <>
+        <input
+          type="radio"
+          name={id}
+          role="tab"
+          class="tab font-mono text-sm"
+          aria-label={tab.label}
+          checked={i === 0}
+        />
+        <div role="tabpanel" class="tab-content">
+          <Code code={tab.code} lang={tab.lang} theme="github-light" />
+        </div>
+      </>
+    ))}
+  </div>
+</div>
+
+<style>
+  .codetabs :global(pre),
+  .codetabs :global(code) {
+    font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+  }
+  .codetabs :global(pre) {
+    margin: 0;
+    border-radius: 0;
+    overflow-x: auto;
+    max-width: 100%;
+    padding: 1rem;
+    background-color: oklch(var(--bc2) / 0.05) !important;
+  }
+</style>

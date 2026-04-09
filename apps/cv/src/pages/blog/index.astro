@@ -14,13 +14,14 @@ type BlogPost = {
     description?: string;
     tags?: string[];
   };
-  compiledContent: () => string;
+  Content: astroHTML.JSX.Element;
+  compiledContent?: () => string;
 };
 
-const postModules = import.meta.glob("../../content/blogs/*.md", { eager: true }) as Record<string, BlogPost>;
+const postModules = import.meta.glob("../../content/blogs/*.{md,mdx}", { eager: true }) as Record<string, BlogPost>;
 
 const posts = Object.entries(postModules).map(([path, mod]) => ({
-  slug: path.split("/").pop()!.replace(/\.md$/, ""),
+  slug: path.split("/").pop()!.replace(/\.mdx?$/, ""),
   ...mod,
 }));
 

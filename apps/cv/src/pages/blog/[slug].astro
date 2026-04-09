@@ -12,13 +12,14 @@ type BlogPost = {
     description?: string;
     tags?: string[];
   };
-  compiledContent: () => string;
+  Content: astroHTML.JSX.Element;
+  compiledContent?: () => string;
 };
 
-const postModules = import.meta.glob("../../content/blogs/*.md", { eager: true }) as Record<string, BlogPost>;
+const postModules = import.meta.glob("../../content/blogs/*.{md,mdx}", { eager: true }) as Record<string, BlogPost>;
 
 const posts = Object.entries(postModules).map(([path, mod]) => ({
-  slug: path.split("/").pop()!.replace(/\.md$/, ""),
+  slug: path.split("/").pop()!.replace(/\.mdx?$/, ""),
   ...mod,
 }));
 
@@ -37,12 +38,7 @@ const title = `${post.frontmatter.title} - ${about.frontmatter.name}`;
 <Nav />
 
   <main class="mx-auto flex-grow max-w-3xl py-6 w-[95vw]">
-    <a href="/blog" class="text-sm text-secondary hover:underline mb-4 inline-flex items-center gap-1">
-      <Icon name="carbon:arrow-left" class="w-4 h-4" />
-      Back to blog
-    </a>
-
-    <article class="mt-4">
+    <article>
       <h1 class="text-3xl font-extrabold tracking-tight mb-2">
         {post.frontmatter.title}
       </h1>
@@ -64,7 +60,7 @@ const title = `${post.frontmatter.title} - ${about.frontmatter.name}`;
       <div class="divider"></div>
 
       <div class="prose max-w-none">
-        <Fragment set:html={post.compiledContent()} />
+        <post.Content />
       </div>
     </article>
   </main>

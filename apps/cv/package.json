@@ -13,9 +13,11 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/mdx": "^5.0.3",
     "@astrojs/tailwind": "^5.1.5",
     "@astrojs/vercel": "^10.0.3",
     "@fontsource-variable/dm-sans": "^5.0.5",
+    "@fontsource-variable/jetbrains-mono": "^5.2.8",
     "@iconify-json/carbon": "^1.1.31",
     "@iconify-json/mdi": "^1.1.64",
     "astro": "^6.1.2",
