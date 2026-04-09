@@ -1,0 +1,220 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { Icon } from "astro-icon/components";
+import * as about from "../content/about/about.md";
+
+type MarkdownInstance = {
+  frontmatter: { title: string; url?: string; icon?: string; label?: string };
+};
+
+const contact = Object.values(
+  import.meta.glob("../content/contact/*.md", { eager: true })
+) as MarkdownInstance[];
+
+const title = `${about.frontmatter.name} - Business Card`;
+---
+
+<BaseLayout title={title}>
+  <div class="flex flex-col items-center justify-center min-h-screen gap-8 p-4">
+    <p class="text-xs text-base-content/40 print:hidden">
+      Print this page (Ctrl+P) to get your business cards. Set margins to none for best results.
+    </p>
+
+    <!-- Business card grid for printing -->
+    <div class="card-sheet">
+      {Array.from({ length: 8 }).map(() => (
+        <div class="business-card">
+          <div class="card-inner">
+            <!-- Left content -->
+            <div class="card-content">
+              <h1 class="card-name">{about.frontmatter.name}</h1>
+              <h2 class="card-title">{about.frontmatter.designation}</h2>
+
+              <div class="card-details">
+                <div class="card-detail">
+                  <Icon name="carbon:location" class="card-icon" />
+                  <span>{about.frontmatter.location}</span>
+                </div>
+                {contact.map((item) => (
+                  <div class="card-detail">
+                    <Icon name={item.frontmatter.icon!} class="card-icon" />
+                    <span>{item.frontmatter.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <!-- QR code -->
+            <div class="card-qr">
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://zac.ooo&format=svg`}
+                alt="QR code linking to zac.ooo"
+                class="qr-img"
+              />
+              <span class="qr-label">zac.ooo</span>
+            </div>
+          </div>
+
+          <!-- Hatch decoration along bottom -->
+          <div class="card-hatch"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+</BaseLayout>
+
+<style>
+  /* Business card: 3.5in x 2in standard size */
+  .business-card {
+    width: 3.5in;
+    height: 2in;
+    border: 1px solid oklch(var(--bc) / 0.15);
+    border-radius: 0.25rem;
+    padding: 0.25in;
+    position: relative;
+    overflow: hidden;
+    box-sizing: border-box;
+    background: oklch(var(--b1));
+  }
+
+  .card-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    height: 100%;
+  }
+
+  .card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.15in;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .card-name {
+    font-family: "DM Sans Variable", sans-serif;
+    font-weight: 800;
+    font-size: 14pt;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: oklch(var(--bc));
+  }
+
+  .card-title {
+    font-family: "DM Sans Variable", sans-serif;
+    font-size: 8pt;
+    color: oklch(var(--s));
+    line-height: 1;
+  }
+
+  .card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.04in;
+    margin-top: 0.05in;
+  }
+
+  .card-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.06in;
+    font-size: 6.5pt;
+    color: oklch(var(--bc) / 0.6);
+    line-height: 1.2;
+  }
+
+  .card-icon {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+  }
+
+  .card-qr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.04in;
+  }
+
+  .qr-img {
+    width: 1.1in;
+    height: 1.1in;
+  }
+
+  .qr-label {
+    font-family: "DM Sans Variable", sans-serif;
+    font-size: 7pt;
+    font-weight: 600;
+    color: oklch(var(--bc) / 0.4);
+    letter-spacing: -0.02em;
+  }
+
+  .card-hatch {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: repeating-linear-gradient(
+      45deg,
+      oklch(var(--s)) 0px,
+      oklch(var(--s)) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+    opacity: 0.3;
+  }
+
+  /* Screen: show single card centered */
+  .card-sheet {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    justify-content: center;
+  }
+
+  /* On screen, only show one card */
+  .card-sheet .business-card:not(:first-child) {
+    display: none;
+  }
+
+  /* Print: fill an A4/Letter sheet with cards */
+  @media print {
+    @page {
+      margin: 0;
+      size: letter;
+    }
+
+    body {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      margin: 0;
+      padding: 0;
+    }
+
+    .card-sheet {
+      display: grid;
+      grid-template-columns: repeat(2, 3.5in);
+      grid-template-rows: repeat(4, 2in);
+      gap: 0;
+      justify-content: center;
+      align-content: center;
+      width: 100%;
+      height: 100vh;
+      padding: 0.5in 0.75in;
+      box-sizing: border-box;
+    }
+
+    .card-sheet .business-card:not(:first-child) {
+      display: block;
+    }
+
+    .business-card {
+      border: 1px dashed oklch(var(--bc) / 0.1);
+      border-radius: 0;
+    }
+  }
+</style>
