@@ -44,7 +44,7 @@ function clip
         functions -e _clip_cleanup
     end
 
-    $argv 2>&1 | tee /dev/tty | tee $tmpfile
+    $argv 2>&1 | tee $tmpfile
     cat $tmpfile | $clipboard
     rm -f $tmpfile
     functions -e _clip_cleanup
@@ -80,7 +80,7 @@ clip() {
 
     trap 'cat "$tmpfile" | $clipboard; rm -f "$tmpfile"; trap - INT; kill -INT $$' INT
 
-    "$@" 2>&1 | tee /dev/tty | tee "$tmpfile"
+    "$@" 2>&1 | tee "$tmpfile"
     local exit_code=\${PIPESTATUS[0]}
     cat "$tmpfile" | $clipboard
     rm -f "$tmpfile"
