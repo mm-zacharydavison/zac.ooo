@@ -17,8 +17,15 @@ const {
     ogImage,
 } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? "https://zac.ooo");
-const screenshotURL = ogImage ?? `https://api.microlink.io/?url=${encodeURIComponent(canonicalURL.href)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1200&viewport.height=630`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? "https://www.zac.ooo");
+const microlinkURL = new URL("https://api.microlink.io/");
+microlinkURL.searchParams.set("url", canonicalURL.href);
+microlinkURL.searchParams.set("screenshot", "true");
+microlinkURL.searchParams.set("meta", "false");
+microlinkURL.searchParams.set("embed", "screenshot.url");
+microlinkURL.searchParams.set("viewport.width", "1200");
+microlinkURL.searchParams.set("viewport.height", "630");
+const screenshotURL = ogImage ?? microlinkURL.href;
 ---
 
 <!doctype html>
