@@ -23,6 +23,10 @@ const posts = Object.entries(postModules).map(([path, mod]) => ({
   ...mod,
 }));
 
+function renderInlineCode(text: string) {
+  return text.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
+
 const { slug } = Astro.params;
 const post = posts.find((p) => p.slug === slug);
 
@@ -39,9 +43,7 @@ const title = `${post.frontmatter.title} - ${about.frontmatter.name}`;
 
   <main class="mx-auto flex-grow max-w-3xl pt-6 pb-[25vh] w-[95vw]">
     <article>
-      <h1 class="text-3xl font-extrabold tracking-tight mb-2">
-        {post.frontmatter.title}
-      </h1>
+      <h1 class="text-3xl font-extrabold tracking-tight mb-2" set:html={renderInlineCode(post.frontmatter.title)} />
       <time class="text-sm text-secondary font-mono">
         {new Date(post.frontmatter.date).toLocaleDateString("en-US", {
           year: "numeric",

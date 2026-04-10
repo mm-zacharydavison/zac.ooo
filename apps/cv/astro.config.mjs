@@ -11,5 +11,10 @@ import mdx from "@astrojs/mdx";
 export default defineConfig({
   integrations: [tailwind(), icon(), compress(), mdx()],
   output: "server",
-  adapter: vercel()
+  adapter: vercel(),
+  markdown: {
+    shikiConfig: {
+      theme: "github-light",
+    },
+  }
 });

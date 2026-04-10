@@ -105,6 +105,27 @@ const {
         }
     }
 
+    .prose code {
+        font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+        background-color: oklch(var(--bc2) / 0.05);
+        padding: 0.15em 0.35em;
+        border-radius: 0.25rem;
+        font-size: 0.85em;
+    }
+
+    .prose pre {
+        border: 1px solid oklch(var(--bc) / 0.1);
+        border-radius: 0.25rem;
+        background-color: oklch(var(--bc2) / 0.05) !important;
+    }
+
+    .prose pre code {
+        background-color: transparent;
+        padding: 0;
+        border-radius: 0;
+        font-size: inherit;
+    }
+
     /* Custom prose styles to preserve multiple newlines and whitespace */
     .prose p:empty {
         height: 1em;

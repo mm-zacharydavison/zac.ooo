@@ -15,9 +15,10 @@ When working with AI tools, I find myself frequently copying the output of shell
   {
     label: "Fish",
     lang: "fish",
-    code: `# Ensure that the output of a call is also piped into \`pbcopy\` so you can copy paste it easily (e.g. into \`claude\`)
+    code: `
+# Ensure that the output of a call is also piped into \`pbcopy\` 
+# so you can copy paste it easily (e.g. into \`claude\`)
 # Works even if you CTRL+C out of a running operation.
-
 function clip
     # Detect clipboard command
     if type -q pbcopy
@@ -53,9 +54,10 @@ end`,
   {
     label: "Bash",
     lang: "bash",
-    code: `# Ensure that the output of a call is also piped into \`pbcopy\` so you can copy paste it easily (e.g. into \`claude\`)
+    code: `
+# Ensure that the output of a call is also piped into \`pbcopy\` 
+# so you can copy paste it easily (e.g. into \`claude\`)
 # Works even if you CTRL+C out of a running operation.
-
 clip() {
     # Detect clipboard command
     if command -v pbcopy &>/dev/null; then
@@ -89,6 +91,10 @@ clip() {
 ]} />
 
 You can place `clip` before any shell command, and the output will be printed normally, and also copied to clipboard.
+
+```bash
+clip bun run tests:e2e
+```
 
 It even traps, so if you exit the command in progress (e.g. with CTRL+C), you still get the output.
 

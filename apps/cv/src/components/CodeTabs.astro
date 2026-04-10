@@ -11,12 +11,19 @@ interface Props {
   tabs: Tab[];
 }
 
-const { tabs } = Astro.props;
+const { tabs: rawTabs } = Astro.props;
+const tabs = rawTabs.map(tab => ({ ...tab, code: tab.code.replace(/^\n+/, '') }));
 const id = `codetabs-${Math.random().toString(36).slice(2, 8)}`;
 ---
 
-<div class="codetabs not-prose border border-base-300 rounded-box overflow-hidden">
-  <div role="tablist" class="tabs tabs-bordered bg-base-200 border-b border-base-300">
+<div class="codetabs not-prose border border-base-300 rounded-box" data-codes={JSON.stringify(tabs.map(t => t.code))}>
+  <div class="tab-bar">
+    <button class="copy-btn" aria-label="Copy to clipboard">
+      <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+      <svg class="check-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </button>
+  </div>
+  <div role="tablist" class="tabs tabs-bordered">
     {tabs.map((tab, i) => (
       <>
         <input
@@ -46,6 +53,58 @@ const id = `codetabs-${Math.random().toString(36).slice(2, 8)}`;
     overflow-x: auto;
     max-width: 100%;
     padding: 1rem;
+    font-size: 0.85em;
     background-color: oklch(var(--bc2) / 0.05) !important;
   }
+  .codetabs {
+    position: relative;
+  }
+  .tab-bar {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    padding-right: 0.5rem;
+  }
+  .copy-btn {
+    padding: 0.3rem 0.5rem;
+    border-radius: 0.25rem;
+    border: 1px solid oklch(var(--bc) / 0.15);
+    background: transparent;
+    color: oklch(var(--bc) / 0.4);
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .copy-btn:hover {
+    color: oklch(var(--bc) / 0.8);
+    border-color: oklch(var(--bc) / 0.3);
+  }
+  .copy-btn .check-icon {
+    display: none;
+  }
+  .copy-btn.copied .copy-icon {
+    display: none;
+  }
+  .copy-btn.copied .check-icon {
+    display: block;
+    color: oklch(var(--bc) / 0.5);
+  }
+
 </style>
+
+<script>
+  document.querySelectorAll('.codetabs').forEach((container) => {
+    const codes = JSON.parse(container.getAttribute('data-codes') ?? '[]');
+    const btn = container.querySelector('.copy-btn')!;
+    btn.addEventListener('click', async () => {
+      const radios = container.querySelectorAll<HTMLInputElement>('input[type="radio"]');
+      const activeIndex = Array.from(radios).findIndex(r => r.checked);
+      await navigator.clipboard.writeText(codes[activeIndex] ?? '');
+      btn.classList.add('copied');
+      setTimeout(() => btn.classList.remove('copied'), 2000);
+    });
+  });
+</script>
