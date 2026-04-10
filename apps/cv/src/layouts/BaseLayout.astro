@@ -8,12 +8,17 @@ import LinkTooltip from "../components/LinkTooltip.astro";
 interface Props {
     title?: string;
     description?: string;
+    ogImage?: string;
 }
 
 const {
     title = "Zachary Davison",
     description = "~",
+    ogImage,
 } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? "https://zac.ooo");
+const screenshotURL = ogImage ?? `https://api.microlink.io/?url=${encodeURIComponent(canonicalURL.href)}&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1200&viewport.height=630`;
 ---
 
 <!doctype html>
@@ -24,6 +29,20 @@ const {
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="generator" content={Astro.generator} />
         <meta name="description" content={description} />
+
+        <!-- Open Graph -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonicalURL.href} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content={screenshotURL} />
+
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={screenshotURL} />
+
         <link rel="preload" href={dmSansLatin} as="font" type="font/woff2" crossorigin />
         <title>{title}</title>
         <script is:inline>
