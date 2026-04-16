@@ -18,6 +18,7 @@ export default {
 		extend: {
 			fontFamily: {
 				'sans': ["DM Sans", "Inter", ...defaultTheme.fontFamily.sans],
+				'mono': ["JetBrains Mono Variable", ...defaultTheme.fontFamily.mono],
 			},
 		},
 	},

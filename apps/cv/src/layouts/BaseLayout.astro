@@ -1,5 +1,6 @@
 ---
 import "@fontsource-variable/dm-sans";
+import "@fontsource-variable/jetbrains-mono";
 import dmSansLatin from "@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2?url";
 
 import LinkTooltip from "../components/LinkTooltip.astro";
@@ -7,12 +8,24 @@ import LinkTooltip from "../components/LinkTooltip.astro";
 interface Props {
     title?: string;
     description?: string;
+    ogImage?: string;
 }
 
 const {
     title = "Zachary Davison",
     description = "~",
+    ogImage,
 } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site ?? "https://www.zac.ooo");
+const microlinkURL = new URL("https://api.microlink.io/");
+microlinkURL.searchParams.set("url", canonicalURL.href);
+microlinkURL.searchParams.set("screenshot", "true");
+microlinkURL.searchParams.set("meta", "false");
+microlinkURL.searchParams.set("embed", "screenshot.url");
+microlinkURL.searchParams.set("viewport.width", "1200");
+microlinkURL.searchParams.set("viewport.height", "630");
+const screenshotURL = ogImage ?? microlinkURL.href;
 ---
 
 <!doctype html>
@@ -23,6 +36,20 @@ const {
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="generator" content={Astro.generator} />
         <meta name="description" content={description} />
+
+        <!-- Open Graph -->
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={canonicalURL.href} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content={screenshotURL} />
+
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={screenshotURL} />
+
         <link rel="preload" href={dmSansLatin} as="font" type="font/woff2" crossorigin />
         <title>{title}</title>
         <script is:inline>
@@ -102,6 +129,27 @@ const {
         .section-container {
             page-break-inside: avoid;
         }
+    }
+
+    .prose code {
+        font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+        background-color: oklch(var(--bc2) / 0.05);
+        padding: 0.15em 0.35em;
+        border-radius: 0.25rem;
+        font-size: 0.85em;
+    }
+
+    .prose pre {
+        border: 1px solid oklch(var(--bc) / 0.1);
+        border-radius: 0.25rem;
+        background-color: oklch(var(--bc2) / 0.05) !important;
+    }
+
+    .prose pre code {
+        background-color: transparent;
+        padding: 0;
+        border-radius: 0;
+        font-size: inherit;
     }
 
     /* Custom prose styles to preserve multiple newlines and whitespace */

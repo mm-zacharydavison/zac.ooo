@@ -1,0 +1,103 @@
+---
+title: "`clip`: Copy the last command output to clipboard."
+date: 2026-04-09
+description: "When working with AI tools, I find myself frequently copying the output of shell commands manually to paste into an LLM."
+tags:
+  - "shell"
+  - "fish"
+  - "ai"
+---
+import CodeTabs from "../../components/CodeTabs.astro";
+
+When working with AI tools, I find myself frequently copying the output of shell commands manually to paste into an LLM.
+
+<CodeTabs tabs={[
+  {
+    label: "Fish",
+    lang: "fish",
+    code: `
+# Ensure that the output of a call is also piped into \`pbcopy\` 
+# so you can copy paste it easily (e.g. into \`claude\`)
+# Works even if you CTRL+C out of a running operation.
+function clip
+    # Detect clipboard command
+    if type -q pbcopy
+        set clipboard pbcopy
+    else if type -q xclip
+        set clipboard xclip -selection clipboard
+    else if type -q xsel
+        set clipboard xsel --clipboard --input
+    else if type -q wl-copy
+        set clipboard wl-copy
+    else if type -q clip.exe
+        set clipboard clip.exe
+    else
+        echo "clip: no clipboard tool found" >&2
+        return 1
+    end
+
+    set tmpfile (mktemp)
+
+    function _clip_cleanup --on-signal INT
+        cat $tmpfile | $clipboard
+        rm -f $tmpfile
+        functions -e _clip_cleanup
+    end
+
+    $argv 2>&1 | tee $tmpfile
+    cat $tmpfile | $clipboard
+    rm -f $tmpfile
+    functions -e _clip_cleanup
+    return $pipestatus[1]
+end`,
+  },
+  {
+    label: "Bash",
+    lang: "bash",
+    code: `
+# Ensure that the output of a call is also piped into \`pbcopy\` 
+# so you can copy paste it easily (e.g. into \`claude\`)
+# Works even if you CTRL+C out of a running operation.
+clip() {
+    # Detect clipboard command
+    if command -v pbcopy &>/dev/null; then
+        clipboard="pbcopy"
+    elif command -v xclip &>/dev/null; then
+        clipboard="xclip -selection clipboard"
+    elif command -v xsel &>/dev/null; then
+        clipboard="xsel --clipboard --input"
+    elif command -v wl-copy &>/dev/null; then
+        clipboard="wl-copy"
+    elif command -v clip.exe &>/dev/null; then
+        clipboard="clip.exe"
+    else
+        echo "clip: no clipboard tool found" >&2
+        return 1
+    fi
+
+    local tmpfile
+    tmpfile=$(mktemp)
+
+    trap 'cat "$tmpfile" | $clipboard; rm -f "$tmpfile"; trap - INT; kill -INT $$' INT
+
+    "$@" 2>&1 | tee "$tmpfile"
+    local exit_code=\${PIPESTATUS[0]}
+    cat "$tmpfile" | $clipboard
+    rm -f "$tmpfile"
+    trap - INT
+    return $exit_code
+}`,
+  },
+]} />
+
+You can place `clip` before any shell command, and the output will be printed normally, and also copied to clipboard.
+
+```bash
+clip bun run tests:e2e
+```
+
+It even traps, so if you exit the command in progress (e.g. with CTRL+C), you still get the output.
+
+You can then go ahead and paste this somewhere, e.g. into `claude`.
+
+In practice, I use this frequently when running E2E test suites or commands that `claude` struggles to iterate on on its own for some reason.

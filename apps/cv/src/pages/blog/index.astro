@@ -14,15 +14,20 @@ type BlogPost = {
     description?: string;
     tags?: string[];
   };
-  compiledContent: () => string;
+  Content: astroHTML.JSX.Element;
+  compiledContent?: () => string;
 };
 
-const postModules = import.meta.glob("../../content/blogs/*.md", { eager: true }) as Record<string, BlogPost>;
+const postModules = import.meta.glob("../../content/blogs/*.{md,mdx}", { eager: true }) as Record<string, BlogPost>;
 
 const posts = Object.entries(postModules).map(([path, mod]) => ({
-  slug: path.split("/").pop()!.replace(/\.md$/, ""),
+  slug: path.split("/").pop()!.replace(/\.mdx?$/, ""),
   ...mod,
 }));
+
+function renderInlineCode(text: string) {
+  return text.replace(/`([^`]+)`/g, '<code>$1</code>');
+}
 
 const sortedPosts = posts.sort(
   (a, b) =>
@@ -44,9 +49,7 @@ const sortedPosts = posts.sort(
         <a href={`/blog/${post.slug}`} class="block group">
           <article class="card card-compact card-bordered border border-[oklch(var(--s)/0.3)] hover:border-[oklch(var(--s))] transition-all hatch-shadow bg-base-100">
             <div class="card-body">
-              <h2 class="card-title font-extrabold tracking-tight group-hover:underline">
-                {post.frontmatter.title}
-              </h2>
+              <h2 class="card-title font-extrabold tracking-tight " set:html={renderInlineCode(post.frontmatter.title)} />
               <time class="text-sm text-secondary font-mono">
                 {new Date(post.frontmatter.date).toLocaleDateString("en-US", {
                   year: "numeric",
