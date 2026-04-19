@@ -61,9 +61,27 @@ const title = `${post.frontmatter.title} - ${about.frontmatter.name}`;
 
       <div class="divider"></div>
 
-      <div class="prose max-w-none">
+      <div class="prose max-w-none blog-prose">
         <post.Content />
       </div>
     </article>
   </main>
 </BaseLayout>
+
+<script>
+  function applyLinkPreviews() {
+    document.querySelectorAll<HTMLAnchorElement>(".blog-prose a[href]").forEach((a) => {
+      if (a.hasAttribute("data-tooltip")) return;
+      const href = a.getAttribute("href") ?? "";
+      if (!/^https?:\/\//i.test(href)) return;
+      a.setAttribute("data-tooltip", `@[](${href})`);
+    });
+  }
+
+  document.addEventListener("astro:page-load", applyLinkPreviews);
+  if (document.readyState !== "loading") {
+    applyLinkPreviews();
+  } else {
+    document.addEventListener("DOMContentLoaded", applyLinkPreviews);
+  }
+</script>
