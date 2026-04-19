@@ -19,9 +19,9 @@ I work globally with many languages and cultures, residing in Berlin since 2016.
 
 
 Lately I'm working on tooling, platforms, and libraries to enable AI, most of which are open source. 
-[`use-ai`](https://github.com/meetsmore/use-ai "@[use-ai](https://github.com/meetsmore/use-ai)"), [`boilerhouse`](https://github.com/zdavison/boilerhouse "@[boilerhouse](https://github.com/zdavison/boilerhouse)"), [`kadai`](https://github.com/zdavison/kadai "@[kadai](https://github.com/zdavison/kadai)"), [`deer`](https://github.com/zdavison/deer "@[deer](https://github.com/zdavison/deer)").
+[`use-ai`](https://github.com/meetsmore/use-ai "@[use-ai](https://github.com/meetsmore/use-ai)"), [`boilerhouse`](https://github.com/zdavison/boilerhouse "@[boilerhouse](https://github.com/zdavison/boilerhouse)"), [`kadai`](https://github.com/zdavison/kadai "@[kadai](https://github.com/zdavison/kadai)"), [`deer`](https://github.com/zdavison/deer "@[deer](https://github.com/zdavison/deer)"), [`jailed`](https://github.com/zdavison/jailed "@[jailed](https://github.com/zdavison/jailed)")
 
-I'm also very interested in specification languages like [Quint](https://quint-lang.org/) and it's predecessor, [TLA+](https://lamport.azurewebsites.net/tla/tla.html).
+I'm also very interested in specification languages like [Quint](https://quint-lang.org/ "@[Quint](https://quint-lang.org/)") and it's predecessor, [TLA+](https://lamport.azurewebsites.net/tla/tla.html "@[TLA+](https://lamport.azurewebsites.net/tla/tla.html)").
 
 
 I also run [Little Tone Records](https://www.littletonerecords.com/ "@[Little Tone Records](https://www.littletonerecords.com/)"), make music as [George Earnest](https://www.discogs.com/artist/6177774-George-Earnest "@[George Earnest](https://echovoltrecords.bandcamp.com/album/time-heals-all-wounds)") / [G.E.O Corp](https://www.discogs.com/artist/6636928-GEO-Corp "@[G.E.O Corp](https://geocorp.bandcamp.com/album/labrynna-holodrum)"), play in [The Berlin Jazz Workshop](https://www.instagram.com/jazzworkshop_berlin/?hl=en "@[The Berlin Jazz Workshop](https://www.instagram.com/jazzworkshop_berlin/?hl=en)"), and host [a monthly radio show about jazz](https://refugeworldwide.com/artists/george-earnest "@[george earnest](https://refugeworldwide.com/artists/george-earnest)").
