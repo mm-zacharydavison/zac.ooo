@@ -18,36 +18,86 @@ const id = `codetabs-${Math.random().toString(36).slice(2, 8)}`;
 
 <div class="codetabs not-prose border border-base-300 rounded-box" data-codes={JSON.stringify(tabs.map(t => t.code))}>
   <div class="tab-bar">
+    <div class="tab-list" role="tablist">
+      {tabs.map((tab, i) => (
+        <button
+          type="button"
+          role="tab"
+          class:list={["tab-label", i === 0 && "active"]}
+          data-index={i}
+          aria-selected={i === 0}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
     <button class="copy-btn" aria-label="Copy to clipboard">
       <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
       <svg class="check-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </button>
   </div>
-  <div role="tablist" class="tabs tabs-bordered">
+  <div class="tab-panels">
     {tabs.map((tab, i) => (
-      <>
-        <input
-          type="radio"
-          name={id}
-          role="tab"
-          class="tab font-mono text-sm"
-          aria-label={tab.label}
-          checked={i === 0}
-        />
-        <div role="tabpanel" class="tab-content">
-          <Code code={tab.code} lang={tab.lang} theme="github-light" />
-        </div>
-      </>
+      <div role="tabpanel" class:list={["tab-panel", i === 0 && "active"]} data-index={i}>
+        <Code code={tab.code} lang={tab.lang} theme="github-light" />
+      </div>
     ))}
   </div>
 </div>
 
 <style>
-  .codetabs :global(pre),
-  .codetabs :global(code) {
+  .codetabs {
+    position: relative;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .tab-bar {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 0.5rem;
+    border-bottom: 1px solid oklch(var(--bc) / 0.15);
+  }
+  .tab-list {
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+  .tab-label {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+    font-size: 0.875rem;
+    border: none;
+    background: transparent;
+    color: oklch(var(--bc) / 0.5);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.15s;
+  }
+  .tab-label:hover {
+    color: oklch(var(--bc) / 0.8);
+  }
+  .tab-label.active {
+    color: oklch(var(--bc));
+    border-bottom-color: oklch(var(--bc));
+  }
+  .tab-panels {
+    min-width: 0;
+    max-width: 100%;
+  }
+  .tab-panel {
+    display: none;
+    min-width: 0;
+  }
+  .tab-panel.active {
+    display: block;
+  }
+  .tab-panel :global(pre),
+  .tab-panel :global(code) {
     font-family: "JetBrains Mono Variable", ui-monospace, monospace;
   }
-  .codetabs :global(pre) {
+  .tab-panel :global(pre) {
     margin: 0;
     border-radius: 0;
     overflow-x: auto;
@@ -56,27 +106,19 @@ const id = `codetabs-${Math.random().toString(36).slice(2, 8)}`;
     font-size: 0.85em;
     background-color: oklch(var(--bc2) / 0.05) !important;
   }
-  .codetabs {
-    position: relative;
-  }
-  .tab-bar {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 1;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    padding-right: 0.5rem;
-  }
   .copy-btn {
     padding: 0.3rem 0.5rem;
+    margin: 0.25rem 0.5rem;
     border-radius: 0.25rem;
     border: 1px solid oklch(var(--bc) / 0.15);
     background: transparent;
     color: oklch(var(--bc) / 0.4);
     cursor: pointer;
     transition: color 0.15s, border-color 0.15s;
+    display: flex;
+    align-items: center;
+    align-self: center;
+    flex-shrink: 0;
   }
   .copy-btn:hover {
     color: oklch(var(--bc) / 0.8);
@@ -92,16 +134,30 @@ const id = `codetabs-${Math.random().toString(36).slice(2, 8)}`;
     display: block;
     color: oklch(var(--bc) / 0.5);
   }
-
 </style>
 
 <script>
   document.querySelectorAll('.codetabs').forEach((container) => {
     const codes = JSON.parse(container.getAttribute('data-codes') ?? '[]');
-    const btn = container.querySelector('.copy-btn')!;
+    const btn = container.querySelector<HTMLButtonElement>('.copy-btn')!;
+    const labels = container.querySelectorAll<HTMLButtonElement>('.tab-label');
+    const panels = container.querySelectorAll<HTMLElement>('.tab-panel');
+
+    labels.forEach((label) => {
+      label.addEventListener('click', () => {
+        const idx = Number(label.dataset.index);
+        labels.forEach((l, i) => {
+          l.classList.toggle('active', i === idx);
+          l.setAttribute('aria-selected', i === idx ? 'true' : 'false');
+        });
+        panels.forEach((p, i) => {
+          p.classList.toggle('active', i === idx);
+        });
+      });
+    });
+
     btn.addEventListener('click', async () => {
-      const radios = container.querySelectorAll<HTMLInputElement>('input[type="radio"]');
-      const activeIndex = Array.from(radios).findIndex(r => r.checked);
+      const activeIndex = Array.from(labels).findIndex(l => l.classList.contains('active'));
       await navigator.clipboard.writeText(codes[activeIndex] ?? '');
       btn.classList.add('copied');
       setTimeout(() => btn.classList.remove('copied'), 2000);
