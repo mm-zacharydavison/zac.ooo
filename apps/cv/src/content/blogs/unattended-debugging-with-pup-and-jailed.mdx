@@ -27,11 +27,9 @@ This works well, but annoyingly, `claude` likes to use `python3` to write inline
   '                           
 ```
 
-This means I need to continuously approve tool calls for harmless inline `python3` scripts, 
-which reduces the usefulness of the `claude` + `pup` combo for unattended debugging.
+This means I need to continuously approve tool calls for harmless inline `python3` scripts, which reduces the usefulness of the `claude` + `pup` combo for unattended debugging.
 
-So I wrote [`jailed`](https://github.com/zdavison/jailed), 
-a tool that runs those `python3` inline scripts in a sandbox.
+So I wrote [`jailed`](https://github.com/zdavison/jailed), a tool that runs those `python3` inline scripts in a sandbox.
 
 You install `jailed`, and it will automatically sandbox Turing complete binaries to have no network / filesystem access.
 
@@ -63,8 +61,7 @@ Claude's calls to these commands will be transparently sandboxed:
   sed
 ```
 
-`jailed` works by installing a `PreToolUse` hook for `claude` 
-which will automatically prefix the configured binaries with `jailed`.
+`jailed` works by installing a `PreToolUse` hook for `claude` which will automatically prefix the configured binaries with `jailed`.
 
 These binaries will then be executed in an [SRT](https://github.com/anthropic-experimental/sandbox-runtime) sandbox.
 
@@ -77,8 +74,6 @@ It allows you to restrict network & filesystem access as you choose.
 ~/.config/jailed/srt-settings.json
 ```
 
-If you need the `jailed` binaries to be able to access network & filesystem when used by `claude`,
-you can run `unjailed claude` to disable the `jailed` hook.
+If you need the `jailed` binaries to be able to access network & filesystem when used by `claude`, you can run `unjailed claude` to disable the `jailed` hook.
 
-If you're mid conversation and need to switch off the jail termporarily,
-you can CTRL+C `claude`, and re-run it with `unjailed claude -c` to continue the conversation with `jailed` disabled.
+If you're mid conversation and need to switch off the jail termporarily, you can CTRL+C `claude`, and re-run it with `unjailed claude -c` to continue the conversation with `jailed` disabled.
